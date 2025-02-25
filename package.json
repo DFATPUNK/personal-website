@@ -1,0 +1,17 @@
+{
+  "name": "github",
+  "version": "1.0.0",
+  "description": "",
+  "main": "tailwind.config.js",
+  "scripts": {
+  "predeploy": "npm run build",
+  "deploy": "gh-pages -d dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "homepage": "https://DFATPUNK.github.io/personal-website"
+}
