@@ -12,14 +12,17 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.5",
     "@fontsource/press-start-2p": "^5.2.5",
+    "lucide-react": "^0.486.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-rnd": "^10.5.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@tailwindcss/postcss": "^4.0.17",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
+    "@types/react-rnd": "^7.4.4",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.21.0",

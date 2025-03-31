@@ -1,10 +1,10 @@
 import { PropsWithChildren, createContext, useContext, useState } from "react";
-import RetroWindow from "./RetroWindow";
+import { RetroWindow } from "./RetroWindow";
 import Taskbar from "./Taskbar";
 
 interface WindowProps {
   title: string;
-  contentUrl: string;
+  content: React.ReactNode;
 }
 
 interface WindowManagerContextProps {
@@ -72,17 +72,18 @@ export default function WindowManager({ children }: PropsWithChildren) {
 
   return (
     <WindowManagerContext.Provider value={{ openWindow }}>
-      {children} {/* ← contenu de l'app */}
+      {children}
       {openWindows.map((win, index) => (
         <RetroWindow
           key={win.title}
           title={win.title}
-          contentUrl={win.contentUrl}
           zIndex={zIndexes[index]}
           onMinimize={() => minimizeWindow(index)}
           onClose={() => closeWindow(index)}
           onClick={() => restoreWindow(index)}
-        />
+        >
+          {win.content}
+        </RetroWindow>
       ))}
       <Taskbar
         windows={openWindows}
@@ -90,5 +91,5 @@ export default function WindowManager({ children }: PropsWithChildren) {
         onRestore={restoreWindow}
       />
     </WindowManagerContext.Provider>
-  );  
+  );
 }

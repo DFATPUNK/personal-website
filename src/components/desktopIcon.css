@@ -1,0 +1,24 @@
+.desktop-icon {
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 12px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.desktop-icon-image {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.desktop-icon-label {
+  font-family: "Press Start 2P", monospace;
+  font-size: 8px;
+  color: white;
+  text-align: center;
+  margin-top: 6px;
+  text-shadow: 1px 1px #000;
+}

@@ -1,87 +1,43 @@
-import { useEffect, useRef } from "react";
+import React from "react";
+import { Rnd } from "react-rnd";
+import { X } from "lucide-react";
+import "./retroWindow.css";
 
-export interface RetroWindowProps {
+interface RetroWindowProps {
   title: string;
-  contentUrl: string;
-  zIndex: number;
-  onMinimize: () => void;
+  children: React.ReactNode;
   onClose: () => void;
-  onClick: () => void;
+  zIndex: number;
+  defaultPosition?: { x: number; y: number };
+  onMinimize?: () => void;
+  onClick?: () => void;
 }
 
-export default function RetroWindow({
+export const RetroWindow: React.FC<RetroWindowProps> = ({
   title,
-  contentUrl,
-  zIndex,
-  onMinimize,
+  children,
   onClose,
-  onClick,
-}: RetroWindowProps) {
-  const windowRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = windowRef.current;
-    let offsetX = 0;
-    let offsetY = 0;
-    let isDragging = false;
-
-    const onMouseDown = (e: MouseEvent) => {
-      isDragging = true;
-      const rect = el?.getBoundingClientRect();
-      offsetX = e.clientX - (rect?.left ?? 0);
-      offsetY = e.clientY - (rect?.top ?? 0);
-      document.addEventListener("mousemove", onMouseMove);
-      document.addEventListener("mouseup", onMouseUp);
-    };
-
-    const onMouseMove = (e: MouseEvent) => {
-      if (isDragging && el) {
-        el.style.left = `${e.clientX - offsetX}px`;
-        el.style.top = `${e.clientY - offsetY}px`;
-      }
-    };
-
-    const onMouseUp = () => {
-      isDragging = false;
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-
-    const header = el?.querySelector(".window-header");
-    header?.addEventListener("mousedown", onMouseDown as EventListener);
-
-    return () => {
-      header?.removeEventListener("mousedown", onMouseDown as EventListener);
-    };
-  }, []);
-
+  onMinimize,
+  onClick, // ✅ Ajout ici
+  zIndex,
+  defaultPosition = { x: 100, y: 100 },
+}) => {
   return (
-    <div
-      ref={windowRef}
-      className="absolute w-[640px] h-[480px] border border-retroBorder bg-white shadow-lg animate-fadeInRetro"
+    <Rnd
+      default={{ x: defaultPosition.x, y: defaultPosition.y, width: 400, height: 300 }}
+      bounds="parent"
       style={{ zIndex }}
-      onMouseDown={onClick}
+      className="retro-window"
     >
-      <div className="window-header bg-retroTitleBar text-retroTitleBarText p-2 cursor-move flex justify-between items-center">
-        <span className="font-retro text-sm">{title}</span>
-        <div className="flex space-x-1">
-          <button
-            className="w-4 h-4 bg-yellow-300 rounded-sm"
-            onClick={onMinimize}
-            title="Minimiser"
-          />
-          <button
-            className="w-4 h-4 bg-red-500 rounded-sm"
-            onClick={onClose}
-            title="Fermer"
-          />
+      <div className="window-frame" onMouseDown={onClick}>
+        <div className="window-title-bar">
+          <span className="window-title">{title}</span>
+          <button className="window-close-button" onClick={onClose}>
+            <X size={14} />
+          </button>
         </div>
+        <div className="window-content">{children}</div>
       </div>
-      <iframe
-        src={contentUrl}
-        title={title}
-        className="w-full h-[calc(100%-32px)]"
-      />
-    </div>
+    </Rnd>
   );
-}
+};
