@@ -1,43 +1,60 @@
-import React from "react";
 import { Rnd } from "react-rnd";
 import { X } from "lucide-react";
-import "./retroWindow.css";
+import "../styles/retroWindow.css";
 
 interface RetroWindowProps {
   title: string;
   children: React.ReactNode;
   onClose: () => void;
+  onMinimize: () => void;
+  onClick: () => void;
   zIndex: number;
-  defaultPosition?: { x: number; y: number };
-  onMinimize?: () => void;
-  onClick?: () => void;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+  onMove: (x: number, y: number) => void;
 }
 
-export const RetroWindow: React.FC<RetroWindowProps> = ({
+export function RetroWindow({
   title,
   children,
+  onMove,
   onClose,
   onMinimize,
-  onClick, // ✅ Ajout ici
+  onClick,
   zIndex,
-  defaultPosition = { x: 100, y: 100 },
-}) => {
+  x,
+  y,
+  width,
+  height,
+}: RetroWindowProps) {
   return (
     <Rnd
-      default={{ x: defaultPosition.x, y: defaultPosition.y, width: 400, height: 300 }}
+    position={{ x, y }}
+    size={{ width: width || 400, height: height || 300 }}
+    onDragStop={(_, d) => onMove(d.x, d.y)}
       bounds="parent"
-      style={{ zIndex }}
+      style={{
+        position: "absolute",
+        zIndex,
+      }}
       className="retro-window"
     >
       <div className="window-frame" onMouseDown={onClick}>
         <div className="window-title-bar">
           <span className="window-title">{title}</span>
-          <button className="window-close-button" onClick={onClose}>
-            <X size={14} />
-          </button>
+          <div className="window-buttons">
+            <button className="window-minimize-button" onClick={onMinimize}>
+              &minus;
+            </button>
+            <button className="window-close-button" onClick={onClose}>
+              <X size={14} />
+            </button>
+          </div>
         </div>
         <div className="window-content">{children}</div>
       </div>
     </Rnd>
   );
-};
+}

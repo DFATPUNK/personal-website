@@ -1,5 +1,5 @@
 import React from "react";
-import "./desktopIcon.css";
+import "../styles/desktopIcon.css";
 
 interface DesktopIconProps {
   icon: string; // URL de l'icône PNG

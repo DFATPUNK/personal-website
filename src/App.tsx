@@ -1,13 +1,11 @@
-import ExperienceCard from "./components/ExperienceCard";
-import { workExperiences } from "./data/work";
-import { projectsDone } from "./data/projects";
 import WindowManager, { useWindowManager } from "./components/WindowManager";
-import Footer from "./components/Footer";
-import DownloadWindowLauncher from "./components/DownloadWindowLauncher";
 import DesktopIcon from "./components/DesktopIcon";
 import iconCV from "./assets/icons/cv.png";
+import folderIcon from "./assets/icons/folder.png"
 import React, { useState } from "react";
 import BootScreen from "./components/BootScreen";
+import CVWindow from "./components/windows/CVWindow";
+import AssetsWindow from "./components/windows/AssetsWindow";
 
 function Desktop() {
   const { openWindow } = useWindowManager();
@@ -21,6 +19,7 @@ function Desktop() {
           <p>Ce site est en cours de transformation pour ressembler à un bureau rétro !</p>
         </div>
       ),
+      minimized: false,
     });
   }, []);
 
@@ -34,25 +33,27 @@ function Desktop() {
           onDoubleClick={() =>
             openWindow({
               title: "CV",
-              content: (
-                <iframe
-                  src="/CV_Jeremy_Brunet_Mars_2025.pdf"
-                  width="100%"
-                  height="100%"
-                  style={{ border: "none" }}
-                />
-              ),
+              content: <CVWindow />,
+              width: 700,
+              height: 700,
+              minimized: false,
+            })  
+          }
+        />
+        <DesktopIcon
+          icon={folderIcon} // 📁 une icône de dossier, si tu en as une
+          label="Assets"
+          onDoubleClick={() =>
+            openWindow({
+              title: "Assets",
+              content: <AssetsWindow />,
+              minimized: false,
+              width: 400,
+              height: 300,
             })
           }
         />
       </div>
-
-      {/* Taskbar */}
-      <footer className="taskbar">
-        <button className="taskbar-button">Démarrer</button>
-        <div className="taskbar-spacer"></div>
-        <div className="taskbar-clock">12:00</div>
-      </footer>
     </div>
   );
 }

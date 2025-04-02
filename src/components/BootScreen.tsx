@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./bootScreen.css";
+import "../styles/bootScreen.css";
 
 const BootScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   const [step, setStep] = useState(0);

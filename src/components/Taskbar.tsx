@@ -1,28 +1,28 @@
-export interface TaskbarProps {
-  windows: { title: string }[];
+import "../styles/taskBar.css";
+
+interface TaskbarProps {
+  windows: { title: string; minimized: boolean }[];
   zIndexes: number[];
-  onRestore: (index: number) => void;
+  onRestore: (title: string) => void;
 }
 
-export default function Taskbar({ windows, zIndexes, onRestore }: TaskbarProps) {
+export default function Taskbar({ windows, onRestore }: TaskbarProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-10 bg-retroTaskbar border-t border-retroTaskbarBorder flex items-center px-2 space-x-2 z-[999]">
-      {windows.map((win, index) => {
-        const isMinimized = zIndexes[index] === -1;
-        return (
+    <footer className="taskbar">
+      <button className="taskbar-start-button">Démarrer</button>
+      <div className="taskbar-separator" />
+      <div className="taskbar-windows">
+        {windows.map((win) => (
           <button
             key={win.title}
-            className={`px-3 py-1 border border-retroBorder rounded-sm font-retro text-xs ${
-              isMinimized
-                ? "bg-retroGray text-black"
-                : "bg-retroAccent text-white"
-            }`}
-            onClick={() => onRestore(index)}
+            className={`taskbar-window-button ${win.minimized ? "" : "active"}`}
+            onClick={() => onRestore(win.title)}
           >
             {win.title}
           </button>
-        );
-      })}
-    </div>
+        ))}
+      </div>
+      <div className="taskbar-clock">12:00</div>
+    </footer>
   );
 }

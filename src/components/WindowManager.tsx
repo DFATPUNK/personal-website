@@ -5,10 +5,18 @@ import Taskbar from "./Taskbar";
 interface WindowProps {
   title: string;
   content: React.ReactNode;
+  minimized: boolean;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
 }
 
 interface WindowManagerContextProps {
-  openWindow: (window: WindowProps) => void;
+  openWindow: (window: Omit<WindowProps, "x" | "y">) => void;
+  minimizeWindow: (title: string) => void;
+  toggleWindow: (title: string) => void;
+  moveWindow: (title: string, x: number, y: number) => void;
 }
 
 const WindowManagerContext = createContext<WindowManagerContextProps | null>(
@@ -28,36 +36,80 @@ export default function WindowManager({ children }: PropsWithChildren) {
   const [zIndexes, setZIndexes] = useState<number[]>([]);
   const [highestZIndex, setHighestZIndex] = useState(100);
 
-  const openWindow = (newWindow: WindowProps) => {
-    const existingIndex = openWindows.findIndex(
-      (w) => w.title === newWindow.title
-    );
+  const openWindow = (newWindow: Omit<WindowProps, "x" | "y">) => {
+    const existingIndex = openWindows.findIndex((w) => w.title === newWindow.title);
 
     if (existingIndex !== -1) {
-      const newZ = highestZIndex + 1;
-      const updatedZIndexes = [...zIndexes];
-      updatedZIndexes[existingIndex] = newZ;
-      setZIndexes(updatedZIndexes);
-      setHighestZIndex(newZ);
+      bringToFront(newWindow.title);
+      const updatedWindows = [...openWindows];
+      updatedWindows[existingIndex].minimized = false;
+      setOpenWindows(updatedWindows);
       return;
     }
 
-    setOpenWindows([...openWindows, newWindow]);
+    const offset = openWindows.length * 20;
+    const defaultX = 100 + offset;
+    const defaultY = 100 + offset;
+
+    setOpenWindows([
+      ...openWindows,
+      {
+        ...newWindow,
+        minimized: false,
+        x: defaultX,
+        y: defaultY,
+        width: newWindow.width,
+        height: newWindow.height,
+      },
+    ]);
     setZIndexes([...zIndexes, highestZIndex + 1]);
     setHighestZIndex(highestZIndex + 1);
   };
 
-  const minimizeWindow = (index: number) => {
-    const updatedZ = [...zIndexes];
-    updatedZ[index] = -1;
-    setZIndexes(updatedZ);
+  const minimizeWindow = (title: string) => {
+    const index = openWindows.findIndex((w) => w.title === title);
+    if (index === -1) return;
+    const updatedWindows = [...openWindows];
+    updatedWindows[index].minimized = true;
+    setOpenWindows(updatedWindows);
   };
 
-  const restoreWindow = (index: number) => {
+  const toggleWindow = (title: string) => {
+    const index = openWindows.findIndex((w) => w.title === title);
+    if (index === -1) return;
+
+    const updated = [...openWindows];
+    const updatedZIndexes = [...zIndexes];
+
+    if (updated[index].minimized) {
+      const newZ = highestZIndex + 1;
+      updated[index].minimized = false;
+      updatedZIndexes[index] = newZ;
+      setHighestZIndex(newZ);
+    } else {
+      updated[index].minimized = true;
+    }
+
+    setOpenWindows(updated);
+    setZIndexes(updatedZIndexes);
+  };
+
+  const moveWindow = (title: string, x: number, y: number) => {
+    const index = openWindows.findIndex((w) => w.title === title);
+    if (index === -1) return;
+    const updated = [...openWindows];
+    updated[index].x = x;
+    updated[index].y = y;
+    setOpenWindows(updated);
+  };
+
+  const bringToFront = (title: string) => {
+    const index = openWindows.findIndex((w) => w.title === title);
+    if (index === -1) return;
     const newZ = highestZIndex + 1;
-    const updatedZ = [...zIndexes];
-    updatedZ[index] = newZ;
-    setZIndexes(updatedZ);
+    const updatedZIndexes = [...zIndexes];
+    updatedZIndexes[index] = newZ;
+    setZIndexes(updatedZIndexes);
     setHighestZIndex(newZ);
   };
 
@@ -71,24 +123,31 @@ export default function WindowManager({ children }: PropsWithChildren) {
   };
 
   return (
-    <WindowManagerContext.Provider value={{ openWindow }}>
+    <WindowManagerContext.Provider value={{ openWindow, minimizeWindow, toggleWindow, moveWindow }}>
       {children}
-      {openWindows.map((win, index) => (
-        <RetroWindow
-          key={win.title}
-          title={win.title}
-          zIndex={zIndexes[index]}
-          onMinimize={() => minimizeWindow(index)}
-          onClose={() => closeWindow(index)}
-          onClick={() => restoreWindow(index)}
-        >
-          {win.content}
-        </RetroWindow>
-      ))}
+      {openWindows.map((win, index) =>
+        win.minimized ? null : (
+          <RetroWindow
+            key={win.title}
+            title={win.title}
+            zIndex={zIndexes[index]}
+            x={win.x}
+            y={win.y}
+            width={win.width}
+            height={win.height}
+            onMinimize={() => minimizeWindow(win.title)}
+            onClose={() => closeWindow(index)}
+            onClick={() => bringToFront(win.title)}
+            onMove={(x, y) => moveWindow(win.title, x, y)}
+          >
+            {win.content}
+          </RetroWindow>
+        )
+      )}
       <Taskbar
         windows={openWindows}
         zIndexes={zIndexes}
-        onRestore={restoreWindow}
+        onRestore={toggleWindow}
       />
     </WindowManagerContext.Provider>
   );
