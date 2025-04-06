@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AssetsWindow from "./windows/AssetsWindow";
 import ArticlesWindow from "./windows/ArticlesWindow";
 import IdentityCard from "./windows/IdentityCard";
 import "../styles/taskBar.css";
 import userIcon from "../assets/icons/user.png";
 import folderIcon from "../assets/icons/folder.png";
-import gearIcon from "../assets/icons/gear.png";
 import certificateIcon from "../assets/icons/certificate.png";
+import mediumIcon from "../assets/icons/medium.png";
+import maddynessIcon from "../assets/icons/maddyness.jpg";
 
 interface StartMenuProps {
   onOpenWindow: (props: {
@@ -16,14 +17,26 @@ interface StartMenuProps {
     width?: number;
     height?: number;
   }) => void;
+  onCloseMenu: () => void;
 }
 
-const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow }) => {
+const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu }) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        onCloseMenu(); // 👈 ferme entièrement le menu
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);  
 
   return (
-    <div className="start-menu">
+    <div className="start-menu" ref={menuRef}>
       <ul className="start-menu-list">
       <li className="start-menu-item" onClick={() =>
         onOpenWindow({
@@ -121,58 +134,35 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow }) => {
                     <li
                       className="submenu-item"
                       onClick={() =>
-                        onOpenWindow({
-                          title: "Startup Peter",
-                          content: <p>Article sur ma startup Peter</p>,
-                          minimized: false,
-                          width: 500,
-                          height: 300,
-                        })
+                        window.open("https://medium.com/user-experience-design-1/how-to-hack-people-loyalty-with-care-f2ce9346c47c", "_blank")
                       }
                     >
-                      Startup Peter
+                      <img src={mediumIcon} className="start-menu-icon" /> How to hack people loyalty with care?
+                    </li>
+
+                    <li
+                      className="submenu-item"
+                      onClick={() =>
+                        window.open("https://medium.com/hackernoon/how-to-scrap-didier-deschamps-email-651891ebe1e4", "_blank")
+                      }
+                    >
+                      <img src={mediumIcon} className="start-menu-icon" /> How to scrap Didier Deschamps email
                     </li>
                     <li
                       className="submenu-item"
                       onClick={() =>
-                        onOpenWindow({
-                          title: "Medium #1",
-                          content: <p>Article Medium #1</p>,
-                          minimized: false,
-                          width: 500,
-                          height: 300,
-                        })
+                        window.open("https://medium.com/free-code-camp/and-the-award-for-the-best-mooc-goes-to-308604e5bf2a", "_blank")
                       }
                     >
-                      Medium #1
+                      <img src={mediumIcon} className="start-menu-icon" /> And the award for the best MOOC goes to…🥁
                     </li>
                     <li
                       className="submenu-item"
                       onClick={() =>
-                        onOpenWindow({
-                          title: "Medium #2",
-                          content: <p>Article Medium #2</p>,
-                          minimized: false,
-                          width: 500,
-                          height: 300,
-                        })
+                        window.open("https://www.maddyness.com/2017/10/24/exclu-peter-chatbot-aide-devoirs-leve-400-000-euros/", "_blank")
                       }
                     >
-                      Medium #2
-                    </li>
-                    <li
-                      className="submenu-item"
-                      onClick={() =>
-                        onOpenWindow({
-                          title: "Medium #3",
-                          content: <p>Article Medium #3</p>,
-                          minimized: false,
-                          width: 500,
-                          height: 300,
-                        })
-                      }
-                    >
-                      Medium #3
+                      <img src={maddynessIcon} className="start-menu-icon" /> Peter, le chatbot d’aide aux devoirs...
                     </li>
                   </ul>
                 )}
@@ -180,8 +170,9 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow }) => {
             </ul>
           )}
         </li>
-
-        {/*<li className="start-menu-item" onClick={() =>
+        {/* Trouver de bonnes idées à implémenter dans un panel de configuration
+        
+        <li className="start-menu-item" onClick={() =>
           onOpenWindow({
             title: "Preferences",
             content: <p>Préférences</p>,

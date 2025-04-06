@@ -5,7 +5,6 @@ import "../styles/taskBar.css";
 
 interface TaskbarProps {
   windows: { title: string; minimized: boolean }[];
-  zIndexes: number[];
   onRestore: (title: string) => void;
   onOpenWindow: (props: {
     title: string;
@@ -16,9 +15,8 @@ interface TaskbarProps {
   }) => void;
 }
 
-
-const Taskbar: React.FC<TaskbarProps> = ({ windows, zIndexes, onRestore, onOpenWindow }) => {
-  const [time, setTime] = useState(() => {
+const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow }) => {
+  const [time] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   });
@@ -31,17 +29,22 @@ const Taskbar: React.FC<TaskbarProps> = ({ windows, zIndexes, onRestore, onOpenW
         className={`taskbar-start-button ${startMenuVisible ? "active" : ""}`}
         onClick={() => setStartMenuVisible(!startMenuVisible)}
       >
-        <img src={startIcon} className="start-menu-icon" />Démarrer
+        <img src={startIcon} className="start-menu-icon" />
+        Démarrer
       </button>
 
       {startMenuVisible && (
-        <StartMenu onOpenWindow={onOpenWindow} />
+        <StartMenu
+          onOpenWindow={onOpenWindow}
+          onCloseMenu={() => setStartMenuVisible(false)}
+        />
       )}
+
 
       <div className="taskbar-separator" />
 
       <div className="taskbar-windows">
-        {windows.map((win, i) => (
+        {windows.map((win, _) => (
           <button
             key={win.title}
             className={`taskbar-window-button ${!win.minimized ? "active" : ""}`}

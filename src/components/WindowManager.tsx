@@ -130,9 +130,8 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       )}
       <Taskbar
         windows={windows.map(({ title, minimized }) => ({ title, minimized }))}
-        zIndexes={windows.map(w => w.zIndex)}
         onRestore={toggleWindow}
-        onOpenWindow={openWindow} // ✅ ici
+        onOpenWindow={openWindow}
       />
     </WindowManagerContext.Provider>
   );
