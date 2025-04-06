@@ -1,0 +1,144 @@
+.taskbar-start-button {
+    background-image: linear-gradient(to top left, #113988, #9b9999);
+    color: white;
+    border: 2px outset #fff;
+    font-weight: bold;
+    padding: 3px 12px;
+    height: 26px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
+  .taskbar-start-button.active {
+    border: 2px inset white;
+    background-image: linear-gradient(to bottom left, #7bb0e0, #d8d8d8);
+  }
+  
+  .start-menu {
+    position: absolute;
+    bottom: 2.5rem;
+    left: 0.5rem;
+    background: #c0c0c0;
+    border: 2px outset white;
+    box-shadow: 2px 2px black;
+    width: 200px;
+    font-family: sans-serif;
+    z-index: 1000;
+  }
+  
+  .start-menu-list,
+  .submenu {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0;
+  }
+  
+  .start-menu-item {
+    padding: 6px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .start-menu-item:hover,
+  .submenu-item:hover {
+    background: navy;
+    color: white;
+  }
+  
+  .start-menu-icon {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+  }
+  
+  .has-submenu {
+    position: relative;
+  }
+  
+  .submenu {
+    position: absolute;
+    bottom: 0;
+    left: 100%;
+    background: #c0c0c0;
+    color : black;
+    border: 2px outset white;
+    box-shadow: 2px 2px black;
+    min-width: 160px;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .submenu-right {
+    bottom: 0;
+    left: 100%;
+  }
+  
+  .submenu-item {
+    padding: 6px 12px;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  .taskbar-separator {
+    width: 2px;
+    height: 60%;
+    background: #555;
+    margin: 0 8px;
+  } 
+
+  .taskbar-windows {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+    overflow-x: auto;
+  }
+  
+  .taskbar-window-button {
+    background-image: linear-gradient(to top left, #9b9999, #d8d8d8);
+    border: 2px outset white;
+    padding: 2px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    height: 24px;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .taskbar-window-button.active {
+    border: 2px inset white;
+    background-image: linear-gradient(to bottom left, #9b9999, #d8d8d8);
+    font-weight: bold;
+  }
+  
+  
+.taskbar-clock {
+    font-family: monospace;
+    font-size: 12px;
+    color: #222;
+    background: #e0e0e0;
+    border: 2px inset #fff;
+    padding: 2px 8px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 60px;
+    box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #000;
+    margin-left: auto;
+  }
+
+.blinking-colon {
+    animation: blink 1s steps(1, start) infinite;
+  }
+  
+@keyframes blink {
+    50% {
+      visibility: hidden;
+    }
+  }
+  

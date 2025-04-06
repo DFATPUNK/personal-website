@@ -9,6 +9,7 @@
 }
 
 .window-frame {
+  cursor: default;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -37,6 +38,7 @@
 }
 
 .window-minimize-button,
+.window-download-button,
 .window-close-button {
   background: #c0c0c0;
   border: 2px outset #fff;
@@ -53,6 +55,7 @@
 
 .window-content {
   background: #ffffff;
+  font-family: "Press Start 2P", monospace;
   padding: 16px;
   flex-grow: 1;
   overflow: auto;
@@ -62,8 +65,18 @@
   color: #000;
 }
 
+.signature {
+  padding: 16px;
+  flex-grow: 1;
+  overflow: auto;
+  font-family: "Press Start 2P", monospace;
+  font-size: 14px;
+  text-align: right;
+}
+
 .file-item {
   display: block;
+  font-family: "Press Start 2P", monospace;
   width: fit-content;
   cursor: pointer;
   color: #0044cc;
@@ -71,7 +84,17 @@
   margin: 4px 0;
 }
 
+.file-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
 .file-item:hover {
   color: #000088;
   background-color: #e6e6e6;
+}
+
+.retro-custom-actions {
+  margin-right: 6px;
 }

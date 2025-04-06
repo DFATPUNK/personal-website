@@ -1,5 +1,6 @@
 import { useWindowManager } from "../WindowManager";
 import "../../styles/retroWindow.css";
+import certificateIcon from "../../assets/icons/certificate.png";
 
 export default function AssetsWindow() {
   const { openWindow } = useWindowManager();
@@ -23,19 +24,21 @@ export default function AssetsWindow() {
   };
 
   return (
-    <div className="p-4 space-y-2 text-sm font-mono">
+    <div className="window-content">
       <div 
         className="file-item"
         onClick={() => openImage("CS50 Certificate", "cs50.png")}
       >
-        📄 cs50.png
+      <img src={certificateIcon} className="start-menu-icon" />cs50.pdf
       </div>
+      <p>Obtenu en 2016 avec un GPA de 1.0 (100%)</p>
       <div 
         className="file-item"
         onClick={() => openImage("Zapier Certificate", "zapier_certificate.png")}
       >
-        📄 zapier_certificate.png
+        <img src={certificateIcon} className="start-menu-icon" />zapier_certificate.pdf
       </div>
+      <p>Je suis certifié Expert Zapier depuis Mars 2022.</p>
     </div>
   );
 }

@@ -8,6 +8,7 @@ import CVWindow from "./components/windows/CVWindow";
 import AssetsWindow from "./components/windows/AssetsWindow";
 import ArticlesWindow from "./components/windows/ArticlesWindow";
 import articleIcon from "./assets/icons/projects.png";
+import "./index.css"
 
 function Desktop() {
   const { openWindow } = useWindowManager();
@@ -17,8 +18,16 @@ function Desktop() {
       title: "Bienvenue",
       content: (
         <div className="p-4 space-y-2">
-          <p>Bienvenue sur mon site personnel 👋</p>
-          <p>Ce site est en cours de transformation pour ressembler à un bureau rétro !</p>
+          <h3>Bienvenue sur mon site personnel 👋</h3>
+          <p>Vous trouverez sur mon bureau : </p>
+          <li>mon CV</li>
+          <li>mes certificats dans 'Assets'</li>
+          <li>mes essais et articles dans 'Articles'</li>
+          <p>Le menu 'Démarrer' vous proposera de : </p>
+          <li>modifier les paramètres du site & accéder au code source</li>
+          <li>parcourir mes documents</li>
+          <li>me contacter</li>
+          <div className="signature">Jérémy Brunet</div>
         </div>
       ),
       minimized: false,
@@ -43,7 +52,7 @@ function Desktop() {
           }
         />
         <DesktopIcon
-          icon={folderIcon} // 📁 une icône de dossier, si tu en as une
+          icon={folderIcon}
           label="Assets"
           onDoubleClick={() =>
             openWindow({
@@ -56,15 +65,15 @@ function Desktop() {
           }
         />
         <DesktopIcon
-          icon={articleIcon} // 📁 une icône de dossier, si tu en as une
+          icon={articleIcon}
           label="Articles"
           onDoubleClick={() =>
             openWindow({
               title: "Articles",
               content: <ArticlesWindow />,
               minimized: false,
-              width: 400,
-              height: 400,
+              width: 650,
+              height: 550,
             })
           }
         />

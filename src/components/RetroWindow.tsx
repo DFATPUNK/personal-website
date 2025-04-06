@@ -10,11 +10,13 @@ interface RetroWindowProps {
   onClick: () => void;
   onMove?: (x: number, y: number) => void;
   onResize?: (width: number, height: number) => void;
+  resizable?: boolean;
   zIndex: number;
   x: number;
   y: number;
   width?: number;
   height?: number;
+  customActions?: React.ReactNode;
 }
 
 export function RetroWindow({
@@ -25,11 +27,13 @@ export function RetroWindow({
   onClick,
   onMove,
   onResize,
+  resizable,
   zIndex,
   x,
   y,
   width = 400,
   height = 300,
+  customActions
 }: RetroWindowProps) {
   const [size, setSize] = useState({ width, height });
   const [position, setPosition] = useState({ x, y });
@@ -46,6 +50,7 @@ export function RetroWindow({
     <Rnd
       size={size}
       position={position}
+      enableResizing={resizable !== false}
       onResizeStop={(_, __, ref, ___, newPosition) => {
         const newSize = { width: ref.offsetWidth, height: ref.offsetHeight };
         setSize(newSize);
@@ -58,15 +63,15 @@ export function RetroWindow({
         if (onMove) onMove(newPos.x, newPos.y);
       }}
       bounds="parent"
-      enableResizing={true}
       style={{ position: "absolute", zIndex }}
       className="retro-window"
       onMouseDown={onClick}
     >
       <div className="window-frame">
-        <div className="window-title-bar">
+        <div className="window-title-bar" onMouseDown={onClick}>
           <span className="window-title">{title}</span>
           <div className="window-buttons">
+            {customActions}
             <button className="window-minimize-button" onClick={onMinimize}>
               &minus;
             </button>

@@ -2,9 +2,11 @@ import React from "react";
 import "../styles/desktopIcon.css";
 
 interface DesktopIconProps {
-  icon: string; // URL de l'icône PNG
+  icon: string;
   label: string;
   onDoubleClick: () => void;
+  defaultX?: number;
+  defaultY?: number;
 }
 
 const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onDoubleClick }) => {

@@ -39,7 +39,7 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     );
   };
 
-  const openWindow = ({ title, content, minimized, width = 400, height = 300, x, y }: WindowProps) => {
+  const openWindow = ({ title, content, minimized, width = 400, height = 325, x = 200, y = 100 }: WindowProps) => {
     setWindows((prev) => {
       const existing = prev.find((w) => w.title === title);
       if (existing) {
@@ -49,14 +49,10 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             : w
         );
       }
-
       const offset = prev.length * 20;
-      const defaultX = x ?? 200 + offset;
-      const defaultY = y ?? 100 + offset;
-
       return [
         ...prev,
-        { title, content, minimized, width, height, x: defaultX, y: defaultY, zIndex: ++zIndexCounter },
+        { title, content, minimized, width, height, x: x + offset, y: y + offset, zIndex: ++zIndexCounter },
       ];
     });
   };
@@ -74,13 +70,7 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const toggleWindow = (title: string) => {
     setWindows((prev) =>
       prev.map((w) =>
-        w.title === title
-          ? {
-              ...w,
-              minimized: !w.minimized,
-              zIndex: !w.minimized ? ++zIndexCounter : w.zIndex,
-            }
-          : w
+        w.title === title ? { ...w, minimized: !w.minimized, zIndex: ++zIndexCounter } : w
       )
     );
   };
@@ -92,39 +82,57 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   const resizeWindow = (title: string, width: number, height: number) => {
+    if (title === "Bienvenue") return;
+  
     setWindows((prev) =>
-      prev.map((w) => (w.title === title ? { ...w, width, height } : w))
+      prev.map((w) =>
+        w.title === title ? { ...w, width, height } : w
+      )
     );
-  };
+  };  
 
   return (
     <WindowManagerContext.Provider value={{ openWindow }}>
       {children}
       {windows.map(
-        ({ title, content, minimized, width, height, x = 100, y = 100, zIndex }) =>
-          !minimized && (
-            <RetroWindow
-              key={title}
-              title={title}
-              zIndex={zIndex}
-              x={x}
-              y={y}
-              width={width}
-              height={height}
-              onMinimize={() => minimizeWindow(title)}
-              onClose={() => closeWindow(title)}
-              onClick={() => bringToFront(title)}
-              onMove={(x, y) => moveWindow(title, x, y)}
-              onResize={(w, h) => resizeWindow(title, w, h)}
-            >
-              {content}
-            </RetroWindow>
-          )
+  ({ title, content, minimized, width, height, x = 100, y = 100, zIndex }) =>
+    !minimized && (
+      <RetroWindow
+  key={title}
+  title={title}
+  zIndex={zIndex}
+  x={x}
+  y={y}
+  width={width}
+  height={height}
+  onMinimize={() => minimizeWindow(title)}
+  onClose={() => closeWindow(title)}
+  onClick={() => bringToFront(title)}
+  onMove={(x, y) => moveWindow(title, x, y)}
+  onResize={(w, h) => resizeWindow(title, w, h)}
+  resizable={title !== "Bienvenue"}
+  customActions={
+    title === "CV" ? (
+      <a
+        href="../public/certificates/CV Jérémy Brunet Mars 2025.pdf"
+        download
+        title="Télécharger le CV"
+      >
+        <button className="window-download-button">💾</button>
+      </a>
+    ) : null
+  }
+>
+  {content}
+</RetroWindow>
+
+    )
       )}
       <Taskbar
         windows={windows.map(({ title, minimized }) => ({ title, minimized }))}
-        zIndexes={windows.map(({ zIndex }) => zIndex)}
+        zIndexes={windows.map(w => w.zIndex)}
         onRestore={toggleWindow}
+        onOpenWindow={openWindow} // ✅ ici
       />
     </WindowManagerContext.Provider>
   );
