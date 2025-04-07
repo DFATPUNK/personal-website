@@ -29,7 +29,7 @@ const BootScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
           {step === 1 && "Initializing retro kernel..."}
           {step === 2 && "Loading assets..."}
           {step === 3 && "Starting GUI..."}
-          {step >= 4 && "Welcome, Jeremy 👋"}
+          {step >= 4 && "Welcome to jeremybrunet.com 👾"}
         </p>
       </div>
     </div>
