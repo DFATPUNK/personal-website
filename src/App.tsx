@@ -1,13 +1,14 @@
 import WindowManager, { useWindowManager } from "./components/WindowManager";
 import DesktopIcon from "./components/DesktopIcon";
 import iconCV from "./assets/icons/cv.png";
-import folderIcon from "./assets/icons/folder.png"
+import folderIcon from "./assets/icons/file_in_folder.png"
+import emailIcon from "./assets/icons/email.png";
+import articleIcon from "./assets/icons/projects.png";
 import React, { useState } from "react";
 import BootScreen from "./components/BootScreen";
 import CVWindow from "./components/windows/CVWindow";
 import AssetsWindow from "./components/windows/AssetsWindow";
 import ArticlesWindow from "./components/windows/ArticlesWindow";
-import articleIcon from "./assets/icons/projects.png";
 import "./index.css"
 
 function Desktop() {
@@ -76,6 +77,13 @@ function Desktop() {
               height: 550,
             })
           }
+        />
+        <DesktopIcon
+          icon={emailIcon}
+          label="Contact"
+          onDoubleClick={() => {
+            window.location.href = "mailto:jeremy@jeremybrunet.com";
+          }}
         />
       </div>
     </div>

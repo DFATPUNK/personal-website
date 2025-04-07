@@ -8,6 +8,7 @@ import folderIcon from "../assets/icons/folder.png";
 import certificateIcon from "../assets/icons/certificate.png";
 import mediumIcon from "../assets/icons/medium.png";
 import maddynessIcon from "../assets/icons/maddyness.jpg";
+import codeIcon from "../assets/icons/source_code.png";
 
 interface StartMenuProps {
   onOpenWindow: (props: {
@@ -170,8 +171,12 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu }) => {
             </ul>
           )}
         </li>
+        <li className="start-menu-item" onClick={() =>
+          window.open("https://github.com/DFATPUNK/personal-website", "_blank")
+        }>
+          <img src={codeIcon} className="start-menu-icon" /> Source Code
+        </li>
         {/* Trouver de bonnes idées à implémenter dans un panel de configuration
-        
         <li className="start-menu-item" onClick={() =>
           onOpenWindow({
             title: "Preferences",
