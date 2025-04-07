@@ -13,7 +13,7 @@ export default function MobileView() {
   
     return (
       <div className="mobile-wrapper">
-        <h1 className="mobile-title animate-glow">Jérémy Brunet</h1>
+        <h1 className="mobile-title">Jérémy Brunet</h1>
         <div className="tree">
   
           {/* CV */}

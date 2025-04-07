@@ -23,10 +23,6 @@
     box-shadow: 2px 2px #808080;
   }
   
-  .animate-glow {
-    animation: glow 1.5s infinite alternate;
-  }
-  
   @keyframes glow {
     from {
       text-shadow: 0 0 2px #fff, 0 0 4px #00f, 0 0 6px #00f;
