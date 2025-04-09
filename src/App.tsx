@@ -4,7 +4,7 @@ import iconCV from "./assets/icons/cv.png";
 import folderIcon from "./assets/icons/file_in_folder.png"
 import emailIcon from "./assets/icons/email.png";
 import articleIcon from "./assets/icons/projects.png";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import BootScreen from "./components/BootScreen";
 import CVWindow from "./components/windows/CVWindow";
 import AssetsWindow from "./components/windows/AssetsWindow";
@@ -94,27 +94,18 @@ function Desktop() {
 
 function App() {
   const [booted, setBooted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
 
-  useEffect(() => {
-    const checkIsMobile = () => {
-      const isTouchDevice = /Mobi|Android/i.test(navigator.userAgent);
-      setIsMobile(isTouchDevice);
-    };
-
-    checkIsMobile();
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
-  }, []);
-
-  if (isMobile) return <MobileView />;
+  if (isMobile) {
+    return <MobileView isMobile={isMobile} setIsMobile={setIsMobile} />;
+  }
 
   if (!booted) {
     return <BootScreen onFinish={() => setBooted(true)} />;
   }
 
   return (
-    <WindowManager>
+    <WindowManager isMobile={isMobile} setIsMobile={setIsMobile}>
       <Desktop />
     </WindowManager>
   );

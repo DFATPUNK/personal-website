@@ -9,6 +9,8 @@ import certificateIcon from "../assets/icons/certificate.png";
 import mediumIcon from "../assets/icons/medium.png";
 import maddynessIcon from "../assets/icons/maddyness.jpg";
 import codeIcon from "../assets/icons/source_code.png";
+import gearIcon from "../assets/icons/gear.png";
+import treeIcon from "../assets/icons/tree.png";
 
 interface StartMenuProps {
   onOpenWindow: (props: {
@@ -19,12 +21,15 @@ interface StartMenuProps {
     height?: number;
   }) => void;
   onCloseMenu: () => void;
+  isMobile: boolean;
+  setIsMobile: (value: boolean) => void;
 }
 
-const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu }) => {
+const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu, isMobile, setIsMobile }) => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [activeSubMenu, setActiveSubMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [activeParameters, setActiveParameters] = useState<string | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -171,23 +176,33 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu }) => {
             </ul>
           )}
         </li>
+        
+        {/* Paramètres */}
+        <li
+          className="start-menu-item has-submenu"
+          onMouseEnter={() => setActiveParameters("parametres")}
+          onMouseLeave={() => setActiveParameters(null)}
+        >
+          <img src={gearIcon} className="start-menu-icon" /> Paramètres
+          {activeParameters === "parametres" && (
+            <ul className="submenu submenu-right">
+              <li
+                className="submenu-item"
+                onClick={() => setIsMobile(!isMobile)}
+              >
+                <img src={treeIcon} className="start-menu-icon" alt="Tree layout" />
+                Tree Layout
+              </li>
+            </ul>
+          )}
+        </li>
+
+        {/* Code source */}
         <li className="start-menu-item" onClick={() =>
           window.open("https://github.com/DFATPUNK/personal-website", "_blank")
         }>
           <img src={codeIcon} className="start-menu-icon" /> Source Code
         </li>
-        {/* Trouver de bonnes idées à implémenter dans un panel de configuration
-        <li className="start-menu-item" onClick={() =>
-          onOpenWindow({
-            title: "Preferences",
-            content: <p>Préférences</p>,
-            minimized: false,
-            width: 400,
-            height: 300,
-          })
-        }>
-          <img src={gearIcon} className="start-menu-icon" /> Paramètres
-        </li>*/}
       </ul>
     </div>
   );

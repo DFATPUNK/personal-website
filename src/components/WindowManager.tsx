@@ -26,7 +26,11 @@ export const useWindowManager = () => {
 
 let zIndexCounter = 1;
 
-const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const WindowManager: React.FC<{
+  children: React.ReactNode;
+  isMobile: boolean;
+  setIsMobile: (val: boolean) => void;
+}> = ({ children, isMobile, setIsMobile }) => {
   const [windows, setWindows] = useState<(WindowProps & {
     zIndex: number;
   })[]>([]);
@@ -132,6 +136,8 @@ const WindowManager: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         windows={windows.map(({ title, minimized }) => ({ title, minimized }))}
         onRestore={toggleWindow}
         onOpenWindow={openWindow}
+        isMobile={isMobile}
+        setIsMobile={setIsMobile}
       />
     </WindowManagerContext.Provider>
   );

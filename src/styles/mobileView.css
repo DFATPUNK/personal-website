@@ -57,6 +57,10 @@
     margin-left: 1.5rem;
     margin-top: 0.3rem;
   }
+
+  .tree-subitem a {
+    cursor: pointer;
+  }
   
   .tree a {
     display: inline-block;

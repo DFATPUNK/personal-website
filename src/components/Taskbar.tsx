@@ -13,9 +13,11 @@ interface TaskbarProps {
     width?: number;
     height?: number;
   }) => void;
+  isMobile: boolean;
+  setIsMobile: (value: boolean) => void;
 }
 
-const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow }) => {
+const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow, isMobile, setIsMobile }) => {
   const [time] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -37,6 +39,8 @@ const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow }) =
         <StartMenu
           onOpenWindow={onOpenWindow}
           onCloseMenu={() => setStartMenuVisible(false)}
+          isMobile={isMobile}
+          setIsMobile={setIsMobile}
         />
       )}
 

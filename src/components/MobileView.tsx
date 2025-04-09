@@ -6,10 +6,25 @@ import emailIcon from "../assets/icons/email.png";
 import codeIcon from "../assets/icons/source_code.png";
 import mediumIcon from "../assets/icons/medium.png";
 import maddynessIcon from "../assets/icons/maddyness.jpg";
+import desktopIcon from "../assets/icons/desktop.png";
+import openParams from "../assets/icons/open_params.png";
+import closedParams from "../assets/icons/closed_params.png";
 
-export default function MobileView() {
+
+type MobileViewProps = {
+  isMobile: boolean;
+  setIsMobile: (val: boolean) => void;
+};
+
+export default function MobileView({ isMobile, setIsMobile }: MobileViewProps) {
     const [certsOpen, setCertsOpen] = useState(true);
     const [articlesOpen, setArticlesOpen] = useState(true);
+    const [parametersOpen, setParametersOpen] = useState(false);
+    
+    const isMobileDevice = () => {
+      if (typeof navigator === "undefined") return false;
+      return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    };    
   
     return (
       <div className="mobile-wrapper">
@@ -67,6 +82,22 @@ export default function MobileView() {
           <div className="tree-item">
             <a href="mailto:jeremy@jeremybrunet.com"><img src={emailIcon} className="start-menu-icon" />Me contacter</a>
           </div>
+
+          {/* Paramètres */}
+          <div className="tree-subgroup">
+            <div className="tree-button" onClick={() => setParametersOpen(!parametersOpen)}>
+                <img src={parametersOpen ? openParams : closedParams} className="start-menu-icon" alt="folder" />
+                Paramètres
+            </div>
+          </div>
+          {!isMobileDevice() && parametersOpen && (
+            <div className="tree-subgroup">
+              <div className="tree-subitem" onClick={() => setIsMobile(!isMobile)}>
+                <a><img src={desktopIcon} className="start-menu-icon" /> Desktop Layout</a>
+              </div>
+              {/* Toggle Day / Night view */}
+            </div>
+          )}
   
           {/* Code source */}
           <div className="tree-item">
