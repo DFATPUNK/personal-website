@@ -12,7 +12,7 @@ import ArticlesWindow from "./components/windows/ArticlesWindow";
 import MobileView from "./components/MobileView";
 import "./index.css"
 
-function Desktop() {
+function Desktop({ isNightMode }: { isNightMode: boolean }) {
   const { openWindow } = useWindowManager();
 
   React.useEffect(() => {
@@ -38,7 +38,7 @@ function Desktop() {
   }, []);
 
   return (
-    <div className="desktop">
+    <div className={`desktop ${isNightMode ? 'night' : 'day'}`}>
       {/* Icône CV */}
       <div className="desktop-icons">
         <DesktopIcon
@@ -95,9 +95,14 @@ function Desktop() {
 function App() {
   const [booted, setBooted] = useState(false);
   const [isMobile, setIsMobile] = useState(true);
+  const [isNightMode, setIsNightMode] = useState<boolean>(() => {
+    const now = new Date();
+    const hour = now.getHours();
+    return hour >= 19 || hour < 7;
+  });
 
   if (isMobile) {
-    return <MobileView isMobile={isMobile} setIsMobile={setIsMobile} />;
+    return <MobileView isMobile={isMobile} setIsMobile={setIsMobile} isNightMode={isNightMode} toggleNightMode={() => setIsNightMode(prev => !prev)} />;
   }
 
   if (!booted) {
@@ -106,7 +111,7 @@ function App() {
 
   return (
     <WindowManager isMobile={isMobile} setIsMobile={setIsMobile}>
-      <Desktop />
+      <Desktop isNightMode={isNightMode} />
     </WindowManager>
   );
 }

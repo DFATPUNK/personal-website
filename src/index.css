@@ -25,12 +25,19 @@ body,
 .desktop {
   width: 100vw;
   height: 100vh;
-  background-image: url('/retro-wallpaper.png');
   background-size: cover;
   background-repeat: repeat;
   position: relative;
   overflow: hidden;
   font-family: sans-serif;
+}
+
+.desktop.day {
+  background-image: url("/retro-wallpaper.png");
+}
+
+.desktop.night {
+  background-image: url("/night-retro-wallpaper.png");
 }
 
 /* Icônes sur le bureau */
@@ -138,4 +145,16 @@ body,
   font-size: 12px;
   width: 3rem;
   text-align: right;
+}
+
+@media screen and (max-width: 768px) {
+  .desktop-icon {
+    color: white;
+  }
+  .retro-window {
+    width: 95%;
+    top: 5%;
+    left: 2.5%;
+    transform: none;
+  }
 }

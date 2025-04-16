@@ -1,5 +1,4 @@
 .mobile-wrapper {
-    background-image: url("/retro-wallpaper.png");
     background-size: cover;
     background-position: center;
     font-family: 'MS Sans Serif', sans-serif;
@@ -12,15 +11,32 @@
     align-items: center;
     justify-content: flex-start;
   }
+
+  .mobile-wrapper.day {
+    background-image: url("/retro-wallpaper.png");
+  }
+  
+  .mobile-wrapper.night {
+    background-image: url("/night-retro-wallpaper.png");
+  }
   
   .mobile-title {
     font-size: 1.8rem;
     margin-bottom: 2rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 2px 2px #808080;
+  }
+
+  .mobile-title.day {
     color: #000;
     background-color: #ffffff;
-    padding: 0.5rem 1rem;
     border: 2px solid #000;
-    box-shadow: 2px 2px #808080;
+  }
+
+  .mobile-title.night {
+    color: #ffffff;
+    background: linear-gradient(to right, #04042e, #000005);
+    border: 2px solid #ffffff;
   }
   
   @keyframes glow {
@@ -44,7 +60,7 @@
     color: #000;
     cursor: pointer;
   }
-  
+
   .tree-item a {
     cursor: default;
   }
@@ -102,4 +118,11 @@
     vertical-align: middle;
     margin-right: 6px;
   }
-  
+
+  .tree-item.night-mode a,
+  .tree-subitem.night-mode a,
+  .tree-button.night-mode {
+    background: linear-gradient(to right, #04042e, #000005);
+    color: white;
+    border: 1px solid white;
+  }
