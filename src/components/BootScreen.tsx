@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../styles/bootScreen.css";
+import desktopIcon from "../assets/icons/desktop.png";
 
 const BootScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
   const [step, setStep] = useState(0);
@@ -26,10 +27,14 @@ const BootScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
       <div className="boot-box">
         <p className="boot-text">
           {step === 0 && ""}
-          {step === 1 && "Initializing retro kernel..."}
+          {step === 1 && "Initializing desktop..."}
           {step === 2 && "Loading assets..."}
           {step === 3 && "Starting GUI..."}
-          {step >= 4 && "Welcome to jeremybrunet.com 👾"}
+          {step >= 4 && (
+            <>
+              Desktop ready <img src={desktopIcon} alt="desktop" style={{ height: "1em", verticalAlign: "middle" }} />
+            </>
+          )}
         </p>
       </div>
     </div>

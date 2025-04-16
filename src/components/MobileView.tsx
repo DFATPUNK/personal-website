@@ -4,6 +4,8 @@ import folderIcon from "../assets/icons/folder.png";
 import openFolderIcon from "../assets/icons/open_folder.png";
 import emailIcon from "../assets/icons/email.png";
 import codeIcon from "../assets/icons/source_code.png";
+import balatroIcon from "../assets/icons/balatro.png";
+import reposIcon from "../assets/icons/all_repos.png";
 import mediumIcon from "../assets/icons/medium.png";
 import maddynessIcon from "../assets/icons/maddyness.jpg";
 import desktopIcon from "../assets/icons/desktop.png";
@@ -19,6 +21,7 @@ type MobileViewProps = {
 export default function MobileView({ isMobile, setIsMobile }: MobileViewProps) {
     const [certsOpen, setCertsOpen] = useState(true);
     const [articlesOpen, setArticlesOpen] = useState(true);
+    const [githubOpen, setGithubOpen] = useState(true);
     const [parametersOpen, setParametersOpen] = useState(false);
     
     const isMobileDevice = () => {
@@ -100,9 +103,25 @@ export default function MobileView({ isMobile, setIsMobile }: MobileViewProps) {
           )}
   
           {/* Code source */}
-          <div className="tree-item">
-            <a href="https://github.com/DFATPUNK/personal-website" target="_blank"><img src={codeIcon} className="start-menu-icon" /> Code source</a>
+          <div className="tree-subgroup">
+            <div className="tree-button" onClick={() => setGithubOpen(!githubOpen)}>
+                <img src={githubOpen ? openFolderIcon : folderIcon} className="start-menu-icon" alt="folder" />
+                Github
+            </div>
           </div>
+          {githubOpen && (
+            <div className="tree-subgroup">
+              <div className="tree-subitem">
+                <a href="https://github.com/DFATPUNK/personal-website" target="_blank"><img src={codeIcon} className="start-menu-icon" /> Code source</a>
+              </div>
+              <div className="tree-subitem">
+                <a href="https://github.com/DFATPUNK/balatro-card-generator" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> Balatro card generator</a>
+              </div>
+              <div className="tree-subitem">
+                <a href="https://github.com/DFATPUNK/" target="_blank"><img src={reposIcon} className="start-menu-icon" /> All repos</a>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

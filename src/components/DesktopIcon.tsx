@@ -4,14 +4,14 @@ import "../styles/desktopIcon.css";
 interface DesktopIconProps {
   icon: string;
   label: string;
-  onDoubleClick: () => void;
+  onClick: () => void;
   defaultX?: number;
   defaultY?: number;
 }
 
-const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onDoubleClick }) => {
+const DesktopIcon: React.FC<DesktopIconProps> = ({ icon, label, onClick }) => {
   return (
-    <div className="desktop-icon" onDoubleClick={onDoubleClick}>
+    <div className="desktop-icon" onClick={onClick}>
       <img src={icon} alt={label} className="desktop-icon-image" />
       <span className="desktop-icon-label">{label}</span>
     </div>

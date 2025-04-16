@@ -44,7 +44,7 @@ function Desktop() {
         <DesktopIcon
           icon={iconCV}
           label="CV"
-          onDoubleClick={() =>
+          onClick={() =>
             openWindow({
               title: "CV",
               content: <CVWindow />,
@@ -57,7 +57,7 @@ function Desktop() {
         <DesktopIcon
           icon={folderIcon}
           label="Assets"
-          onDoubleClick={() =>
+          onClick={() =>
             openWindow({
               title: "Assets",
               content: <AssetsWindow />,
@@ -70,7 +70,7 @@ function Desktop() {
         <DesktopIcon
           icon={articleIcon}
           label="Articles"
-          onDoubleClick={() =>
+          onClick={() =>
             openWindow({
               title: "Articles",
               content: <ArticlesWindow />,
@@ -83,7 +83,7 @@ function Desktop() {
         <DesktopIcon
           icon={emailIcon}
           label="Contact"
-          onDoubleClick={() => {
+          onClick={() => {
             window.location.href = "mailto:jeremy@jeremybrunet.com";
           }}
         />
