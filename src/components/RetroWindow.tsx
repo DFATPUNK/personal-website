@@ -17,6 +17,7 @@ interface RetroWindowProps {
   width?: number;
   height?: number;
   customActions?: React.ReactNode;
+  isNightMode?: boolean;
 }
 
 export function RetroWindow({
@@ -33,7 +34,8 @@ export function RetroWindow({
   y,
   width = 400,
   height = 300,
-  customActions
+  customActions,
+  isNightMode
 }: RetroWindowProps) {
   const [size, setSize] = useState({ width, height });
   const [position, setPosition] = useState({ x, y });
@@ -80,7 +82,7 @@ export function RetroWindow({
             </button>
           </div>
         </div>
-        <div className="window-content">{children}</div>
+        <div className={`window-content ${isNightMode ? "night" : ""}`}>{children}</div>
       </div>
     </Rnd>
   );

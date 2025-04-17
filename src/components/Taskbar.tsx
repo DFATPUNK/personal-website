@@ -15,9 +15,11 @@ interface TaskbarProps {
   }) => void;
   isMobile: boolean;
   setIsMobile: (value: boolean) => void;
+  isNightMode: boolean;
+  setIsNightMode: (value: boolean) => void;
 }
 
-const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow, isMobile, setIsMobile }) => {
+const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow, isMobile, setIsMobile, isNightMode, setIsNightMode }) => {
   const [time] = useState(() => {
     const now = new Date();
     return now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -41,6 +43,8 @@ const Taskbar: React.FC<TaskbarProps> = ({ windows, onRestore, onOpenWindow, isM
           onCloseMenu={() => setStartMenuVisible(false)}
           isMobile={isMobile}
           setIsMobile={setIsMobile}
+          isNightMode={isNightMode}
+          setIsNightMode={setIsNightMode}
         />
       )}
 

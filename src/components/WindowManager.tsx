@@ -30,7 +30,9 @@ const WindowManager: React.FC<{
   children: React.ReactNode;
   isMobile: boolean;
   setIsMobile: (val: boolean) => void;
-}> = ({ children, isMobile, setIsMobile }) => {
+  isNightMode: boolean;
+  setIsNightMode: (val: boolean) => void;
+}> = ({ children, isMobile, setIsMobile, isNightMode, setIsNightMode }) => {
   const [windows, setWindows] = useState<(WindowProps & {
     zIndex: number;
   })[]>([]);
@@ -104,6 +106,7 @@ const WindowManager: React.FC<{
       <RetroWindow
   key={title}
   title={title}
+  isNightMode={isNightMode}
   zIndex={zIndex}
   x={x}
   y={y}
@@ -138,6 +141,8 @@ const WindowManager: React.FC<{
         onOpenWindow={openWindow}
         isMobile={isMobile}
         setIsMobile={setIsMobile}
+        isNightMode={isNightMode}
+        setIsNightMode={setIsNightMode}
       />
     </WindowManagerContext.Provider>
   );

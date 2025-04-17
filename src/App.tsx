@@ -73,7 +73,7 @@ function Desktop({ isNightMode }: { isNightMode: boolean }) {
           onClick={() =>
             openWindow({
               title: "Articles",
-              content: <ArticlesWindow />,
+              content: <ArticlesWindow isNightMode={isNightMode}/>,
               minimized: false,
               width: 650,
               height: 550,
@@ -110,10 +110,10 @@ function App() {
   }
 
   return (
-    <WindowManager isMobile={isMobile} setIsMobile={setIsMobile}>
+    <WindowManager isMobile={isMobile} setIsMobile={setIsMobile} isNightMode={isNightMode} setIsNightMode={setIsNightMode}>
       <Desktop isNightMode={isNightMode} />
     </WindowManager>
-  );
+  );  
 }
 
 export default App;
