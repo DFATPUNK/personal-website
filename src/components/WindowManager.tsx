@@ -121,7 +121,7 @@ const WindowManager: React.FC<{
   customActions={
     title === "CV" ? (
       <a
-        href="../public/certificates/CV Jérémy Brunet Mars 2025.pdf"
+        href="../public/certificates/Resume_Jeremy_Brunet_April_2025.pdf"
         download
         title="Télécharger le CV"
       >
