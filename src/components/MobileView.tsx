@@ -39,7 +39,7 @@ export default function MobileView({ isMobile, setIsMobile, isNightMode, toggleN
 
           {/* CV */}
           <div className={`tree-item ${isNightMode ? "night-mode" : ""}`}>
-            <a href="/certificates/CV%20J%C3%A9r%C3%A9my%20Brunet%20Mars%202025.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
+            <a href="/certificates/Resume_Jeremy_Brunet_April_2025.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
           </div>
 
           {/* Certificats */}
