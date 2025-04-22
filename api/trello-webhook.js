@@ -1,21 +1,22 @@
 export default async function handler(req, res) {
     if (req.method === "HEAD") {
-      // Trello ping initial pour valider l'URL
       return res.status(200).end();
     }
   
     if (req.method === "POST") {
-      // Pass-through vers ton webhook n8n (Production URL conseillé)
-      const response = await fetch("https://jeremybrunet.app.n8n.cloud/webhook/balatro-hand-check", {
+      const headers = {
+        "Content-Type": "application/json",
+      };
+  
+      // Pass-through to n8n webhook
+      await fetch("https://jeremybrunet.app.n8n.cloud/webhook/balatro-hand-check", {
         method: "POST",
-        headers: req.headers,
-        body: req.body
+        headers,
+        body: JSON.stringify(req.body),
       });
   
-      // Répondre à Trello avec un 200 OK quoi qu’il arrive
-      return res.status(200).end();
+      return res.status(200).end(); // Always reply OK to Trello
     }
   
-    // Méthodes non autorisées
     res.status(405).json({ message: "Method not allowed" });
-  }
+  }  
