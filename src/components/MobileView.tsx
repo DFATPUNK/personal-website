@@ -39,7 +39,7 @@ export default function MobileView({ isMobile, setIsMobile, isNightMode, toggleN
 
           {/* CV */}
           <div className={`tree-item ${isNightMode ? "night-mode" : ""}`}>
-            <a href="/certificates/Resume_Jeremy_Brunet_April_2025.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
+            <a href="/certificates/Resume_Jeremy_Brunet_August_2025.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
           </div>
 
           {/* Certificats */}
@@ -97,7 +97,13 @@ export default function MobileView({ isMobile, setIsMobile, isNightMode, toggleN
                 <a href="https://github.com/DFATPUNK/personal-website" target="_blank"><img src={codeIcon} className="start-menu-icon" /> Code source</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
+                <a href="https://github.com/DFATPUNK/ilya30u30" target="_blank"><img src={codeIcon} className="start-menu-icon" /> <i>[WIP]</i> Ilya30u30</a>
+              </div>
+              <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
                 <a href="https://github.com/DFATPUNK/balatro-card-generator" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> Balatro card generator</a>
+              </div>
+              <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
+                <a href="https://github.com/DFATPUNK/oauth-wizard-mvp" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> <i>[WIP]</i> OAuth Wizard</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
                 <a href="https://github.com/DFATPUNK/" target="_blank"><img src={reposIcon} className="start-menu-icon" /> All repos</a>
