@@ -107,7 +107,9 @@ const StartMenu: React.FC<StartMenuProps> = ({ onOpenWindow, onCloseMenu, isMobi
           {activeMenu === "github" && (
             <ul className="submenu submenu-right">
               <li className="submenu-item" onClick={() => window.open("https://github.com/DFATPUNK/personal-website", "_blank")}> <img src={codeIcon} className="start-menu-icon" /> Source Code</li>
+              <li className="submenu-item" onClick={() => window.open("https://github.com/DFATPUNK/ilya30u30", "_blank")}> <img src={codeIcon} className="start-menu-icon" /> <i>[WIP]</i> Ilya30u30</li>
               <li className="submenu-item" onClick={() => window.open("https://github.com/DFATPUNK/balatro-card-generator", "_blank")}> <img src={balatroIcon} className="start-menu-icon" /> Balatro card generator</li>
+              <li className="submenu-item" onClick={() => window.open("https://github.com/DFATPUNK/oauth-wizard-mvp", "_blank")}> <img src={codeIcon} className="start-menu-icon" /> <i>[WIP]</i> OAuth Wizard</li>
               <li className="submenu-item" onClick={() => window.open("https://github.com/DFATPUNK", "_blank")}> <img src={reposIcon} className="start-menu-icon" /> All repos</li>
             </ul>
           )}
