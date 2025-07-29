@@ -12,6 +12,8 @@ import desktopIcon from "../assets/icons/desktop.png";
 import moonIcon from "../assets/icons/moon.png";
 import openParams from "../assets/icons/open_params.png";
 import closedParams from "../assets/icons/closed_params.png";
+import ilyaIcon from "../assets/icons/ilya.png";
+import wizardIcon from "../assets/icons/wizard.png"
 
 
 type MobileViewProps = {
@@ -97,13 +99,13 @@ export default function MobileView({ isMobile, setIsMobile, isNightMode, toggleN
                 <a href="https://github.com/DFATPUNK/personal-website" target="_blank"><img src={codeIcon} className="start-menu-icon" /> Code source</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
-                <a href="https://github.com/DFATPUNK/ilya30u30" target="_blank"><img src={codeIcon} className="start-menu-icon" /> <i>[WIP]</i> Ilya30u30</a>
+                <a href="https://github.com/DFATPUNK/ilya30u30" target="_blank"><img src={ilyaIcon} className="start-menu-icon" /> <i>[WIP]</i> Ilya30u30</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
                 <a href="https://github.com/DFATPUNK/balatro-card-generator" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> Balatro card generator</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
-                <a href="https://github.com/DFATPUNK/oauth-wizard-mvp" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> <i>[WIP]</i> OAuth Wizard</a>
+                <a href="https://github.com/DFATPUNK/oauth-wizard-mvp" target="_blank"><img src={wizardIcon} className="start-menu-icon" /> <i>[WIP]</i> OAuth Wizard</a>
               </div>
               <div className={`tree-subitem ${isNightMode ? "night-mode" : ""}`}>
                 <a href="https://github.com/DFATPUNK/" target="_blank"><img src={reposIcon} className="start-menu-icon" /> All repos</a>

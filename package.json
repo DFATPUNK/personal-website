@@ -15,7 +15,8 @@
     "lucide-react": "^0.486.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-rnd": "^10.5.2"
+    "react-rnd": "^10.5.2",
+    "systemctl": "^0.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
