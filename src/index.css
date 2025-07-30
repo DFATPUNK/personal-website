@@ -38,6 +38,7 @@ body,
 
 .desktop.night {
   background-image: url("/night-retro-wallpaper.png");
+  background-size: auto 100%;
 }
 
 /* Icônes sur le bureau */
