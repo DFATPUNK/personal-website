@@ -121,10 +121,10 @@ const WindowManager: React.FC<{
   customActions={
     title === "CV" ? (
       <a
-        href="../public/certificates/Resume_Jérémy_Brunet_202601.pdf"
+        href="../public/certificates/Resume_Jeremy_Brunet_202601.pdf"
         download
         title="Télécharger le CV"
-      > 
+      >
         <button className="window-download-button">💾</button>
       </a>
     ) : null
