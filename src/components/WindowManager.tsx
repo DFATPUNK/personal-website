@@ -124,7 +124,7 @@ const WindowManager: React.FC<{
         href="../public/certificates/Resume_Jérémy_Brunet_202601.pdf"
         download
         title="Télécharger le CV"
-      >
+      > 
         <button className="window-download-button">💾</button>
       </a>
     ) : null
