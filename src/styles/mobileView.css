@@ -1,129 +1,90 @@
 .mobile-wrapper {
-    background-size: cover;
-    background-position: center;
-    font-family: 'MS Sans Serif', sans-serif;
-    padding: 2rem;
-    min-height: 100vh;
-    color: #000080;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-  }
+  background-image: url("/retro-wallpaper.png");
+  background-size: cover;
+  background-position: center;
+  font-family: "MS Sans Serif", sans-serif;
+  padding: 2rem;
+  min-height: 100vh;
+  color: #000080;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
 
-  .mobile-wrapper.day {
-    background-image: url("/retro-wallpaper.png");
-  }
-  
-  .mobile-wrapper.night {
-    background-image: url("/night-retro-wallpaper.png");
-    background-size: auto 100%;
-  }
-  
-  .mobile-title {
-    font-size: 1.8rem;
-    margin-bottom: 2rem;
-    padding: 0.5rem 1rem;
-    box-shadow: 2px 2px #808080;
-  }
+.mobile-title {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  padding: 0.5rem 1rem;
+  box-shadow: 2px 2px #808080;
+  color: #000;
+  background-color: #ffffff;
+  border: 2px solid #000;
+}
 
-  .mobile-title.day {
-    color: #000;
-    background-color: #ffffff;
-    border: 2px solid #000;
-  }
+.tree {
+  text-align: left;
+  max-width: 320px;
+  width: 100%;
+}
 
-  .mobile-title.night {
-    color: #ffffff;
-    background: linear-gradient(to right, #04042e, #000005);
-    border: 2px solid #ffffff;
-  }
-  
-  @keyframes glow {
-    from {
-      text-shadow: 0 0 2px #fff, 0 0 4px #00f, 0 0 6px #00f;
-    }
-    to {
-      text-shadow: 0 0 3px #fff, 0 0 6px #0080ff, 0 0 8px #0080ff;
-    }
-  }
-  
-  .tree {
-    text-align: left;
-    max-width: 320px;
-    width: 100%;
-  }
-  
-  .tree-item {
-    margin-bottom: 1rem;
-    font-weight: bold;
-    color: #000;
-    cursor: pointer;
-  }
+.tree-item {
+  margin-bottom: 1rem;
+  font-weight: bold;
+  color: #000;
+  cursor: pointer;
+}
 
-  .tree-item a {
-    cursor: default;
-  }
-  
-  .tree-subgroup {
-    margin-bottom: 1rem;
-  }
-  
-  .tree-subitem {
-    margin-left: 1.5rem;
-    margin-top: 0.3rem;
-  }
+.tree-item a {
+  cursor: default;
+}
 
-  .tree-subitem a {
-    cursor: pointer;
-  }
-  
-  .tree a {
-    display: inline-block;
-    background-color: #ffffff;
-    padding: 0.4rem 0.6rem;
-    border: 2px solid #000;
-    text-decoration: none;
-    color: #000;
-    font-weight: normal;
-    box-shadow: 2px 2px #808080;
-    transition: background-color 0.1s ease-in-out;
-  }
-  
-  .tree a:hover {
-    background-color: #dcdcdc;
-    box-shadow: 1px 1px #606060;
-  }
-  
-  .tree-button {
-    display: inline-block;
-    background-color: #ffffff;
-    padding: 0.4rem 0.6rem;
-    border: 2px solid #000;
-    color: #000;
-    font-weight: normal;
-    box-shadow: 2px 2px #808080;
-    cursor: pointer;
-    transition: background-color 0.1s ease-in-out;
-    text-align: left;
-    width: fit-content;
-  }
-  
-  .tree-button:hover {
-    background-color: #dcdcdc;
-    box-shadow: 1px 1px #606060;
-  }
-  
-  .tree-button .icon {
-    vertical-align: middle;
-    margin-right: 6px;
-  }
+.tree-subgroup {
+  margin-bottom: 1rem;
+}
 
-  .tree-item.night-mode a,
-  .tree-subitem.night-mode a,
-  .tree-button.night-mode {
-    background: linear-gradient(to right, #04042e, #000005);
-    color: white;
-    border: 1px solid white;
-  }
+.tree-subitem {
+  margin-left: 1.5rem;
+  margin-top: 0.3rem;
+}
+
+.tree-subitem a {
+  cursor: pointer;
+}
+
+.tree a {
+  display: inline-block;
+  background-color: #ffffff;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #000;
+  text-decoration: none;
+  color: #000;
+  font-weight: normal;
+  box-shadow: 2px 2px #808080;
+  transition: background-color 0.1s ease-in-out;
+}
+
+.tree a:hover {
+  background-color: #dcdcdc;
+  box-shadow: 1px 1px #606060;
+}
+
+.tree-button {
+  display: inline-block;
+  background-color: #ffffff;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #000;
+  color: #000;
+  font-weight: normal;
+  box-shadow: 2px 2px #808080;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+  text-align: left;
+  width: fit-content;
+}
+
+.tree-button:hover {
+  background-color: #dcdcdc;
+  box-shadow: 1px 1px #606060;
+}
