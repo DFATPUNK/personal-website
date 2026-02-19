@@ -47,8 +47,7 @@ export default function MobileView() {
           {/* Articles */}
           <div className="tree-item">
             <div className="tree-button" onClick={() => setArticlesOpen(!articlesOpen)}>
-                <img src={articlesOpen ? openFolderIcon : folderIcon} className="
-                " alt="folder" />
+                <img src={articlesOpen ? openFolderIcon : folderIcon} className="start-menu-icon" alt="folder" />
                 Articles
             </div>
           </div>
