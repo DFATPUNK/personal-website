@@ -2,7 +2,7 @@ import MobileView from "./components/MobileView";
 import "./index.css"
 
 function App() {
-  <MobileView /> 
+  return <MobileView /> 
 }
 
 export default App;
