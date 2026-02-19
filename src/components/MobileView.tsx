@@ -13,8 +13,8 @@ import wizardIcon from "../assets/icons/wizard.png"
 
 export default function MobileView() {
     const [certsOpen, setCertsOpen] = useState(true);
-    const [articlesOpen, setArticlesOpen] = useState(true);
-    const [githubOpen, setGithubOpen] = useState(true);   
+    const [articlesOpen, setArticlesOpen] = useState(false);
+    const [githubOpen, setGithubOpen] = useState(false);   
   
     return (
       <div className="mobile-wrapper">
@@ -81,13 +81,7 @@ export default function MobileView() {
                 <a href="https://github.com/DFATPUNK/personal-website" target="_blank"><img src={codeIcon} className="start-menu-icon" /> Code source</a>
               </div>
               <div className="tree-subitem">
-                <a href="https://github.com/DFATPUNK/ilya30u30" target="_blank"><img src={ilyaIcon} className="start-menu-icon" /> <i>[WIP]</i> Ilya30u30</a>
-              </div>
-              <div className="tree-subitem">
                 <a href="https://github.com/DFATPUNK/balatro-card-generator" target="_blank"><img src={balatroIcon} className="start-menu-icon" /> Balatro card generator</a>
-              </div>
-              <div className="tree-subitem">
-                <a href="https://github.com/DFATPUNK/oauth-wizard-mvp" target="_blank"><img src={wizardIcon} className="start-menu-icon" /> <i>[WIP]</i> OAuth Wizard</a>
               </div>
               <div className="tree-subitem">
                 <a href="https://github.com/DFATPUNK/" target="_blank"><img src={reposIcon} className="start-menu-icon" /> All repos</a>
