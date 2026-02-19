@@ -8,8 +8,6 @@ import balatroIcon from "../assets/icons/balatro.png";
 import reposIcon from "../assets/icons/all_repos.png";
 import mediumIcon from "../assets/icons/medium.png";
 import maddynessIcon from "../assets/icons/maddyness.jpg";
-import ilyaIcon from "../assets/icons/ilya.png";
-import wizardIcon from "../assets/icons/wizard.png"
 
 export default function MobileView() {
     const [certsOpen, setCertsOpen] = useState(true);
