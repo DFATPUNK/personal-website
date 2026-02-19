@@ -30,15 +30,7 @@ body,
   position: relative;
   overflow: hidden;
   font-family: sans-serif;
-}
-
-.desktop.day {
   background-image: url("/retro-wallpaper.png");
-}
-
-.desktop.night {
-  background-image: url("/night-retro-wallpaper.png");
-  background-size: auto 100%;
 }
 
 /* Icônes sur le bureau */
