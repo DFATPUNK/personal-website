@@ -13,7 +13,7 @@
     background-image: url("/retro-wallpaper.png");
   }
   
-  .mobile-title {
+.mobile-title {
     font-size: 1.8rem;
     margin-bottom: 2rem;
     padding: 0.5rem 1rem;
@@ -22,8 +22,14 @@
     background-color: #ffffff;
     border: 2px solid #000;
   }
+
+.start-menu-icon {
+    margin-right: 8px;
+    width: 16px;
+    height: 16px;
+  }
   
-  @keyframes glow {
+@keyframes glow {
     from {
       text-shadow: 0 0 2px #fff, 0 0 4px #00f, 0 0 6px #00f;
     }
@@ -32,37 +38,37 @@
     }
   }
   
-  .tree {
+.tree {
     text-align: left;
     max-width: 320px;
     width: 100%;
   }
   
-  .tree-item {
+.tree-item {
     margin-bottom: 1rem;
     font-weight: bold;
     color: #000;
     cursor: pointer;
   }
 
-  .tree-item a {
+.tree-item a {
     cursor: default;
   }
   
-  .tree-subgroup {
+.tree-subgroup {
     margin-bottom: 1rem;
   }
   
-  .tree-subitem {
+.tree-subitem {
     margin-left: 1.5rem;
     margin-top: 0.3rem;
   }
 
-  .tree-subitem a {
+.tree-subitem a {
     cursor: pointer;
   }
   
-  .tree a {
+.tree a {
     display: inline-block;
     background-color: #ffffff;
     padding: 0.4rem 0.6rem;
@@ -74,12 +80,12 @@
     transition: background-color 0.1s ease-in-out;
   }
   
-  .tree a:hover {
+.tree a:hover {
     background-color: #dcdcdc;
     box-shadow: 1px 1px #606060;
   }
   
-  .tree-button {
+.tree-button {
     display: inline-block;
     background-color: #ffffff;
     padding: 0.4rem 0.6rem;
@@ -93,12 +99,12 @@
     width: fit-content;
   }
   
-  .tree-button:hover {
+.tree-button:hover {
     background-color: #dcdcdc;
     box-shadow: 1px 1px #606060;
   }
   
-  .tree-button .icon {
+.tree-button .icon {
     vertical-align: middle;
     margin-right: 6px;
   }

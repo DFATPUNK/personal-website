@@ -1,5 +1,5 @@
 import MobileView from "./components/MobileView";
-import "./index.css"
+import "./styles/mobileView.css"
 
 function App() {
   return <MobileView /> 
