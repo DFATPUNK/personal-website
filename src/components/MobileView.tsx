@@ -8,7 +8,7 @@ import maddynessIcon from "../assets/icons/maddyness.jpg";
 import demoIcon from "../assets/icons/open_params.png";
 
 export default function MobileView() {
-    const [certsOpen, setCertsOpen] = useState(true);
+    const [certsOpen, setCertsOpen] = useState(false);
     const [articlesOpen, setArticlesOpen] = useState(false);
   
     return (
@@ -16,14 +16,14 @@ export default function MobileView() {
         <h1 className="mobile-title">Jérémy Brunet</h1>
         <div className="tree">
 
-          {/* CV */}
+          {/* Demos */}
           <div className="tree-item">
-            <a href="/certificates/Resume_Jeremy_Brunet_202601.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
+            <a href="https://demos.jeremybrunet.com" target="_blank" rel="noopener noreferrer"><img src={demoIcon} className="start-menu-icon" />Démos</a>
           </div>
 
           {/* CV */}
           <div className="tree-item">
-            <a href="https://demos.jeremybrunet.com" target="_blank" rel="noopener noreferrer"><img src={demoIcon} className="start-menu-icon" />Démos</a>
+            <a href="/certificates/Resume_Jeremy_Brunet_202601.pdf" target="_blank" rel="noopener noreferrer">📄 CV</a>
           </div>
 
           {/* Certificats */}
