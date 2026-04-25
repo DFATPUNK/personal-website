@@ -18,7 +18,7 @@ export default function MobileView() {
 
           {/* Demos */}
           <div className="tree-item">
-            <a href="https://demos.jeremybrunet.com" target="_blank" rel="noopener noreferrer"><img src={demoIcon} className="start-menu-icon" />Démos</a>
+            <a href="https://demos.jeremybrunet.com" rel="noopener noreferrer"><img src={demoIcon} className="start-menu-icon" />Démos</a>
           </div>
 
           {/* CV */}
