@@ -1,9 +1,10 @@
+import { ContactForm } from '@/components/contact/ContactForm'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionRow } from '@/components/ui/SectionRow'
 
 export const metadata = {
   title: 'Contact',
-  description: 'Contact placeholder for the Personal Website V2 foundation.',
+  description: 'Contact Jérémy Brunet about work, roles, essays, or code.',
 }
 
 export default function ContactPage() {
@@ -11,15 +12,11 @@ export default function ContactPage() {
     <>
       <PageHeader
         eyebrow="Contact"
-        title="A safe contact system will arrive in its own PR."
-        description="This route is intentionally static in the foundation. Conditional fields, server validation, anti-spam, and n8n delivery are reserved for PR 5."
+        title="Send a focused note."
+        description="Choose the closest topic and write the context I need to understand the message. The form validates on the server before delivery."
       />
-      <SectionRow title="For now">
-        <p>
-          The current production contact path remains preserved on the archive
-          branch. The future form will validate on the server before forwarding
-          to a configured transport.
-        </p>
+      <SectionRow title="Message">
+        <ContactForm />
       </SectionRow>
     </>
   )
