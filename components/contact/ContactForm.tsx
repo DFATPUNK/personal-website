@@ -179,7 +179,7 @@ export function ContactForm() {
 
       <div>
         <label className="block text-sm font-semibold" htmlFor="contact-topic">
-          Topic <span aria-hidden="true">*</span>
+          Reason for contact <span aria-hidden="true">*</span>
         </label>
         <select
           ref={topicRef}
@@ -197,7 +197,7 @@ export function ContactForm() {
           required
           value={form.topic}
         >
-          <option value="">Select a topic</option>
+          <option value="">Select a reason</option>
           {CONTACT_TOPICS.map((topic) => (
             <option key={topic.value} value={topic.value}>
               {topic.label}

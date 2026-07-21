@@ -13,6 +13,8 @@ import { isObviouslyFakeEmail } from '@/lib/contact/email-validation'
 
 const disallowedControlCharacters = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/
 const dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/
+const missingReasonMessage = 'Please select a reason for contact.'
+const invalidReasonMessage = 'Please select a valid reason for contact.'
 
 export type ContactField = keyof ContactFormInput
 export type ContactFieldErrors = Partial<Record<ContactField, string>>
@@ -33,6 +35,20 @@ type ContactSchemaOptions = {
 
 function normalizeString(value: unknown) {
   return typeof value === 'string' ? value.trim() : value
+}
+
+function normalizeTopic(value: unknown) {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  const trimmed = value.trim()
+
+  return trimmed.length > 0 ? trimmed : undefined
+}
+
+function isContactTopic(value: string): value is ContactTopic {
+  return CONTACT_TOPIC_VALUES.includes(value as ContactTopic)
 }
 
 function normalizeEmail(value: unknown) {
@@ -120,14 +136,13 @@ export function createContactFormSchema(options: ContactSchemaOptions = {}) {
           }),
       ),
       topic: z.preprocess(
-        normalizeString,
-        z.enum(
-          CONTACT_TOPIC_VALUES as [ContactTopic, ContactTopic, ContactTopic, ContactTopic],
-          {
-            required_error: 'Choose a topic.',
-            invalid_type_error: 'Choose a topic.',
-          },
-        ),
+        normalizeTopic,
+        z
+          .string({
+            required_error: missingReasonMessage,
+            invalid_type_error: invalidReasonMessage,
+          })
+          .refine(isContactTopic, invalidReasonMessage),
       ),
       message: z.preprocess(
         (value) => (typeof value === 'string' ? normalizeMessage(value) : value),

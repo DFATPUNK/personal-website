@@ -94,6 +94,24 @@ describe('contact route', () => {
     expect(mockedDeliverContactSubmission).not.toHaveBeenCalled()
   })
 
+  it('returns public copy for an empty topic validation error', async () => {
+    const response = await POST(
+      contactRequest({
+        ...validBody(),
+        topic: '',
+      }),
+    )
+    const body = await readJson(response)
+    const topicError = body.fieldErrors?.topic
+
+    expect(response.status).toBe(422)
+    expect(body.ok).toBe(false)
+    expect(topicError).toBe('Please select a reason for contact.')
+    expect(JSON.stringify(body)).not.toContain('Invalid enum')
+    expect(JSON.stringify(body)).not.toContain('need-help')
+    expect(mockedDeliverContactSubmission).not.toHaveBeenCalled()
+  })
+
   it('handles malformed requests', async () => {
     const response = await POST(contactRequest('{'))
     const body = await readJson(response)

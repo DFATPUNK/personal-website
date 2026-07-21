@@ -36,7 +36,52 @@ describe('contact form schema', () => {
     }
   })
 
-  it('rejects an unsupported topic', () => {
+  it('rejects an empty topic with public reason copy', () => {
+    const result = validateContactFormInput(
+      {
+        ...validInput('other'),
+        topic: '',
+      },
+      { today },
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
+      'Please select a reason for contact.',
+    )
+  })
+
+  it('rejects a missing topic with public reason copy', () => {
+    const result = validateContactFormInput(
+      {
+        email: 'reviewer@acme.co',
+        message: 'This is a useful review message.',
+      },
+      { today },
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
+      'Please select a reason for contact.',
+    )
+  })
+
+  it('rejects a non-string topic with public reason copy', () => {
+    const result = validateContactFormInput(
+      {
+        ...validInput('other'),
+        topic: 123,
+      },
+      { today },
+    )
+
+    expect(result.ok).toBe(false)
+    expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
+      'Please select a valid reason for contact.',
+    )
+  })
+
+  it('rejects an unsupported topic without enum internals', () => {
     const result = validateContactFormInput(
       {
         ...validInput('other'),
@@ -46,7 +91,11 @@ describe('contact form schema', () => {
     )
 
     expect(result.ok).toBe(false)
-    expect(result.ok ? undefined : result.fieldErrors.topic).toBeDefined()
+    const error = result.ok ? undefined : result.fieldErrors.topic
+
+    expect(error).toBe('Please select a valid reason for contact.')
+    expect(error).not.toContain('Invalid enum')
+    expect(error).not.toContain('need-help')
   })
 
   it('requires a message', () => {
