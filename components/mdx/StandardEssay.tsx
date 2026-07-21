@@ -14,10 +14,10 @@ export function StandardEssay({ essay }: { essay: Essay }) {
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--secondary-accent)] sm:tracking-[0.16em]">
           Standard essay
         </p>
-        <h1 className="max-w-3xl text-2xl font-semibold leading-tight sm:text-4xl">
+        <h1 className="max-w-md text-2xl font-semibold leading-tight">
           {essay.metadata.title}
         </h1>
-        <p className="mt-5 text-sm leading-6 text-[var(--muted-foreground)] sm:text-base sm:leading-7">
+        <p className="mt-5 max-w-md text-sm leading-6 text-[var(--muted-foreground)] sm:text-base sm:leading-7">
           {essay.metadata.description}
         </p>
         {essay.metadata.publishedAt ? (

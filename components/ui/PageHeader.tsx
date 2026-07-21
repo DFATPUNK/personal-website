@@ -12,11 +12,11 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="max-w-2xl text-2xl font-semibold leading-tight sm:text-4xl">
+      <h1 className="max-w-md text-2xl font-semibold leading-tight">
         {title}
       </h1>
       {description ? (
-        <p className="mt-5 max-w-2xl text-sm leading-6 text-[var(--muted-foreground)] sm:text-base sm:leading-7">
+        <p className="mt-5 max-w-md text-sm leading-6 text-[var(--muted-foreground)] sm:text-base sm:leading-7">
           {description}
         </p>
       ) : null}
