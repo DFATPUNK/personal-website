@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { DemoLaunchAction } from '@/components/ui/DemoLaunchAction'
 import { PageHeader } from '@/components/ui/PageHeader'
 import {
   getDemoBySlug,
@@ -81,15 +82,11 @@ export default async function DemoPage({ params }: DemoPageProps) {
       <div className="mt-10 border-t border-[var(--border)] pt-6">
         <div className="flex flex-wrap gap-x-5 gap-y-3 text-sm">
           {externalUrl ? (
-            <a
-              aria-label={`Open live demo for ${demo.title}`}
-              className="font-medium text-[var(--accent)]"
-              href={externalUrl}
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Open live demo
-            </a>
+            <DemoLaunchAction
+              demoTitle={demo.title}
+              externalUrl={externalUrl}
+              linkClassName="font-medium text-[var(--accent)]"
+            />
           ) : null}
           {demo.repositoryUrl ? (
             <a

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 
+import { DemoLaunchAction } from '@/components/ui/DemoLaunchAction'
 import { PageHeader } from '@/components/ui/PageHeader'
 import {
   getDemoExternalUrl,
@@ -61,15 +62,11 @@ export default function DemosPage() {
                       Read context
                     </Link>
                     {externalUrl ? (
-                      <a
-                        aria-label={`Open live demo for ${demo.title}`}
-                        className="border-b border-[var(--border)] text-[var(--accent)]"
-                        href={externalUrl}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        Open live demo
-                      </a>
+                      <DemoLaunchAction
+                        demoTitle={demo.title}
+                        externalUrl={externalUrl}
+                        linkClassName="border-b border-[var(--border)] text-[var(--accent)]"
+                      />
                     ) : null}
                   </div>
                 </article>
