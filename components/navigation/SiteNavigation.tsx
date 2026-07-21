@@ -49,11 +49,11 @@ export function SiteNavigation() {
     <header className="border-b border-[var(--border)] bg-[var(--background)] lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
       <div className="flex items-center justify-between px-5 py-4 lg:block lg:px-8 lg:py-10">
         <Link
-          className="block text-sm font-semibold uppercase tracking-[0.16em]"
+          className="block text-sm font-semibold"
           href="/"
           onClick={() => setIsOpen(false)}
         >
-          JB
+          {siteConfig.name}
         </Link>
         <button
           aria-expanded={isOpen}
