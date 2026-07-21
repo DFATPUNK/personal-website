@@ -1,24 +1,87 @@
 # Demo Integration
 
-`DFATPUNK/personal-website` owns `jeremybrunet.com`.
+`DFATPUNK/personal-website` owns presentation and discovery on `jeremybrunet.com`.
 
-`DFATPUNK/demos` owns `demos.jeremybrunet.com` and currently routes to separate demo deployments.
+`DFATPUNK/demos` owns the operational demo host at `demos.jeremybrunet.com` and the Vercel rewrites that route visitors to the individual applications.
 
-The PR 1 foundation does not modify `DFATPUNK/demos`, reverse-proxy demo apps, or move demo source code into the personal website.
+PR 4 uses internal landing pages on the personal website. It does not reverse-proxy, iframe, migrate, or copy application code from `DFATPUNK/demos`.
 
-## Routes Observed During Audit
+## Canonical Routes
 
-- Parameter Golf Calculator
-- Zero-Touch Onboarding / Alan
-- Balatro Joker Generator
+| Display name | Personal website route | External demos route | Source repository | Documentation |
+| --- | --- | --- | --- | --- |
+| Zero-Touch Onboarding / Alan | `/demos/alan` | `https://demos.jeremybrunet.com/alan` | `https://github.com/DFATPUNK/hr-onboarding-engine` | `https://writebook.jeremybrunet.com/3/alan.com` |
+| Balatro Joker Generator | `/demos/balatro` | `https://demos.jeremybrunet.com/balatro` | `https://github.com/DFATPUNK/balatro-card-generator` | None verified during PR 4 |
+| Parameter Golf Calculator | `/demos/pg-calculator` | `https://demos.jeremybrunet.com/pg-calculator` | `https://github.com/DFATPUNK/pg-calculator` | `https://writebook.jeremybrunet.com/5/pg-calculator` |
 
-The demos hub UI and `vercel.json` currently use slightly different route labels for some demos. Resolve canonical paths during the demos PR before creating a final typed catalog.
+The live routes above returned HTTP 200 during the PR 4 audit on July 21, 2026.
 
-## Future Options
+## Observed Route Discrepancy
 
-- Keep `demos.jeremybrunet.com` permanently.
-- Link from `jeremybrunet.com/demos` to external demo deployments.
-- Add `/demos/[slug]` landing pages.
-- Redirect selected `/demos/[slug]` routes.
-- Reverse-proxy selected demos only after reviewing asset paths, APIs, cookies, CORS, and Vercel rewrites.
-- Move selected demos into the main app after a separate migration decision.
+The `DFATPUNK/demos` UI currently links two demos with descriptive local paths:
+
+- `/zero-touch-onboarding` for Zero-Touch Onboarding;
+- `/balatro-joker-generator` for Balatro Joker Generator.
+
+The same repository's `vercel.json` uses the operational rewrite paths:
+
+- `/alan`;
+- `/balatro`;
+- `/pg-calculator`.
+
+For PR 4, the personal website treats the Vercel rewrite configuration and successful live-route verification as the source of truth. The canonical personal-site slugs are `alan`, `balatro`, and `pg-calculator`.
+
+No compatibility redirects were added because there is no evidence that `jeremybrunet.com/demos/zero-touch-onboarding` or `jeremybrunet.com/demos/balatro-joker-generator` previously existed.
+
+## Ownership Boundaries
+
+The personal website is responsible for:
+
+- the `/demos` catalog;
+- stable internal landing pages under `/demos/[slug]`;
+- concise editorial context;
+- links to live applications, repositories, and verified manuals;
+- local typed metadata and validation.
+
+The demos repository is responsible for:
+
+- `demos.jeremybrunet.com`;
+- Vercel rewrites for the hosted applications;
+- application source, APIs, assets, and deployment behavior;
+- any future repair of old UI paths.
+
+PR 4 does not require modifying `DFATPUNK/demos`.
+
+## Landing Page Decision
+
+Each personal-site demo route is an internal landing page. The page gives context, lists topics, and links to the externally hosted live application.
+
+This keeps `jeremybrunet.com` responsible for presentation while `demos.jeremybrunet.com` remains responsible for application hosting.
+
+The release deliberately does not:
+
+- reverse-proxy demo applications;
+- embed applications in iframes;
+- migrate demo source code into the personal website;
+- copy application APIs;
+- add cross-project Vercel rewrites;
+- change DNS or subdomains.
+
+## Adding A Future Demo
+
+Future public demos should be added by editing the typed registry in `lib/content/demos.ts`.
+
+Before adding a live entry:
+
+1. Verify the public external route.
+2. Choose one URL-safe canonical slug.
+3. Store the external path, such as `/mlp`, rather than repeating the demos host.
+4. Add verified repository and documentation URLs only when available.
+5. Use only registered topic tags.
+6. Add or update focused registry tests when the route set changes.
+
+Adding a future `/demos/mlp` page should require a registry entry, not a layout rewrite.
+
+## Deferred MLP Entry
+
+MLP is intentionally not published in PR 4. Add it later after its stable public destination and final display wording are confirmed.

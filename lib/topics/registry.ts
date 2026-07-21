@@ -11,6 +11,7 @@ export const topicSlugs = [
   'apis',
   'data',
   'event-driven-architecture',
+  'react',
 ] as const
 
 export type TopicSlug = (typeof topicSlugs)[number]
@@ -26,6 +27,7 @@ const topicLabels = {
   apis: 'APIs',
   data: 'Data',
   'event-driven-architecture': 'Event-driven Architecture',
+  react: 'React',
 } satisfies Record<TopicSlug, string>
 
 export const topics = topicSlugs.map((slug) => ({
