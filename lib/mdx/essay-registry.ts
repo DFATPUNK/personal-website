@@ -18,3 +18,7 @@ export function getStandardEssayComponent(slug: string) {
 export function getImmersiveEssayComponent(slug: string) {
   return immersiveEssayRegistry[slug]
 }
+
+export function getRegisteredImmersiveEssaySlugs() {
+  return Object.keys(immersiveEssayRegistry)
+}

@@ -4,10 +4,13 @@ import { notFound } from 'next/navigation'
 import { StandardEssay } from '@/components/mdx/StandardEssay'
 import {
   getEssayBySlug,
-  getEssaySlugs,
+  getEssayStaticParams,
   type Essay,
 } from '@/lib/content/essays'
-import { getImmersiveEssayComponent } from '@/lib/mdx/essay-registry'
+import {
+  getImmersiveEssayComponent,
+  getRegisteredImmersiveEssaySlugs,
+} from '@/lib/mdx/essay-registry'
 import { absoluteUrl } from '@/lib/seo/urls'
 
 type EssayPageProps = {
@@ -17,14 +20,18 @@ type EssayPageProps = {
 }
 
 export function generateStaticParams() {
-  return getEssaySlugs().map((slug) => ({ slug }))
+  return getEssayStaticParams({
+    registeredImmersiveSlugs: getRegisteredImmersiveEssaySlugs(),
+  })
 }
 
 export async function generateMetadata({
   params,
 }: EssayPageProps): Promise<Metadata> {
   const { slug } = await params
-  const essay = getEssayBySlug(slug)
+  const essay = getEssayBySlug(slug, {
+    registeredImmersiveSlugs: getRegisteredImmersiveEssaySlugs(),
+  })
 
   if (!essay) {
     return {}
@@ -57,7 +64,9 @@ function renderEssay(essay: Essay) {
 
 export default async function EssayPage({ params }: EssayPageProps) {
   const { slug } = await params
-  const essay = getEssayBySlug(slug)
+  const essay = getEssayBySlug(slug, {
+    registeredImmersiveSlugs: getRegisteredImmersiveEssaySlugs(),
+  })
 
   if (!essay) {
     notFound()
