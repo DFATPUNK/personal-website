@@ -35,6 +35,10 @@ export const topics = topicSlugs.map((slug) => ({
 
 export const topicSlugSchema = z.enum(topicSlugs)
 
+export function getTopicLabel(slug: TopicSlug) {
+  return topicLabels[slug]
+}
+
 export function normalizeTopicSlug(value: string) {
   return value
     .trim()
