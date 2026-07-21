@@ -1,23 +1,54 @@
-# Bienvenue
+# Personal Website V2
 
-[jeremybrunet.com](https://www.jeremybrunet.com) a été développé en React + TS avec Vite.
-Je continuerai de le mettre à jour régulièrement, vous pouvez me soumettre vos idées par email : [jeremy@jeremybrunet.com](mailto:jeremy@jeremybrunet.com)
+This repository powers `jeremybrunet.com`.
 
-## Contenu
+The V2 foundation migrates the site from Vite to Next.js App Router with TypeScript, Tailwind CSS, MDX, and local content validation.
 
-Vous retrouverez sur [jeremybrunet.com](https://www.jeremybrunet.com) :
+## Stack
 
-- Mon CV
-- Mes assets (certificats)
-- Mes articles
-- Mes coordonnées complètes
+- Next.js App Router
+- TypeScript
+- Tailwind CSS
+- MDX
+- Zod
+- Vitest
+- Vercel
 
-**En cours de développement** : 
+## Local Setup
 
-- un panneau de configuration pour modifier l'apparence du site
-- une carte de visite animée & téléchargeable contenant toutes mes coordonnées
-- une liste de livres lus & en cours de lecture
+```txt
+npm install
+npm run dev
+```
 
-## Contact
+## Validation
 
-[jeremy@jeremybrunet.com](mailto:jeremy@jeremybrunet.com)
+```txt
+npm run lint
+npm run typecheck
+npm run test
+npm run build
+```
+
+## Content
+
+- Local essays live in `content/essays`.
+- Essay frontmatter is validated in `lib/content/essays.ts`.
+- Topics are centralized in `lib/topics/registry.ts`.
+- Placeholder profile, demos, and contact pages are intentionally minimal in PR 1.
+
+## Deployment Notes
+
+Vercel production is configured to track `main`. Do not merge migration work without review.
+
+The pre-Next.js production site is preserved on:
+
+```txt
+archive/pre-nextjs-redesign
+```
+
+Rollback options include redeploying the archive branch or reverting a future merge commit. Do not reset `main` without explicit approval.
+
+## Related Repository
+
+`DFATPUNK/demos` owns `demos.jeremybrunet.com`. Do not modify that repository during the initial website refactor.

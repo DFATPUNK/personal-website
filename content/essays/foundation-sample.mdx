@@ -1,0 +1,27 @@
+---
+title: "Foundation sample essay"
+slug: "foundation-sample"
+description: "A compact MDX essay proving standard rendering, frontmatter validation, code blocks, and KaTeX formulas."
+publishedAt: "2026-07-21"
+status: "published"
+layout: "standard"
+tags:
+  - ai
+  - automations
+---
+
+This sample exists to validate the first publishing boundary. It is intentionally small: one paragraph, one code block, and one mathematical expression.
+
+```ts
+type EssayLayout = 'standard' | 'immersive'
+
+const defaultLayout: EssayLayout = 'standard'
+```
+
+The renderer also supports math through KaTeX:
+
+$$
+f(x) = x^2 + 2x + 1
+$$
+
+Future immersive essays can register a bespoke renderer by slug, but this foundation only renders the standard layout.
