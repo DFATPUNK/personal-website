@@ -46,6 +46,7 @@ export const essayMetadataSchema = z
     externalUrl: urlSchema.optional(),
     repositoryUrl: urlSchema.optional(),
   })
+  .strict()
   .superRefine((metadata, context) => {
     if (metadata.status === 'published' && !metadata.publishedAt) {
       context.addIssue({

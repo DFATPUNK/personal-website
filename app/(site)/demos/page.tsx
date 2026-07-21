@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { DemoLaunchAction } from '@/components/ui/DemoLaunchAction'
@@ -7,11 +8,15 @@ import {
   getDemoInternalPath,
   getPublicDemos,
 } from '@/lib/content/demos'
+import { absoluteUrl } from '@/lib/seo/urls'
 import { getTopicLabel } from '@/lib/topics/registry'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Demos',
   description: 'A concise catalog of live technical demos by Jérémy Brunet.',
+  alternates: {
+    canonical: absoluteUrl('/demos'),
+  },
 }
 
 export default function DemosPage() {

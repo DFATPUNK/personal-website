@@ -3,20 +3,35 @@ import type { ReactNode } from 'react'
 import './globals.css'
 
 import { siteConfig } from '@/lib/site-config'
+import { absoluteUrl, getCanonicalOrigin } from '@/lib/seo/urls'
+
+const canonicalOrigin = getCanonicalOrigin()
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(canonicalOrigin),
   title: {
     default: siteConfig.title,
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
+  alternates: {
+    canonical: absoluteUrl('/'),
+  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
-    url: siteConfig.url,
+    url: absoluteUrl('/'),
     siteName: siteConfig.name,
     type: 'website',
+  },
+  robots: {
+    follow: true,
+    index: true,
+  },
+  twitter: {
+    card: 'summary',
+    title: siteConfig.title,
+    description: siteConfig.description,
   },
 }
 
@@ -30,9 +45,25 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode
 }>) {
+  const websiteStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: siteConfig.name,
+    url: absoluteUrl('/'),
+    description: siteConfig.description,
+  }
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteStructuredData),
+          }}
+          type="application/ld+json"
+        />
+        {children}
+      </body>
     </html>
   )
 }

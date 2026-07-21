@@ -1,10 +1,16 @@
+import type { Metadata } from 'next'
+
 import { ContactForm } from '@/components/contact/ContactForm'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionRow } from '@/components/ui/SectionRow'
+import { absoluteUrl } from '@/lib/seo/urls'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Contact',
   description: 'Contact Jérémy Brunet about work, roles, essays, or code.',
+  alternates: {
+    canonical: absoluteUrl('/contact'),
+  },
 }
 
 export default function ContactPage() {

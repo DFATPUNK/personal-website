@@ -129,6 +129,7 @@ describe('demo registry', () => {
   it('looks up public demos by canonical slug', () => {
     expect(getDemoBySlug('balatro')?.title).toBe('Balatro Joker Generator')
     expect(getDemoBySlug('zero-touch-onboarding')).toBeUndefined()
+    expect(getDemoBySlug('unknown-demo')).toBeUndefined()
   })
 
   it('derives internal paths and static params from public slugs', () => {

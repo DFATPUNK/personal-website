@@ -39,6 +39,12 @@ export async function generateMetadata({
     alternates: {
       canonical: absoluteUrl(getDemoInternalPath(demo)),
     },
+    openGraph: {
+      title: demo.title,
+      description: demo.shortDescription,
+      type: 'website',
+      url: absoluteUrl(getDemoInternalPath(demo)),
+    },
   }
 }
 

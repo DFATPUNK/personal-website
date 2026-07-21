@@ -81,3 +81,19 @@ The Vercel Preview build can succeed without this value, but actual delivery ret
 ## Local Testing
 
 Do not send personal test messages to a real webhook. Use tests with mocked `fetch`, or configure a temporary local/test webhook only after explicit human approval.
+
+## PR 6 readiness notes
+
+- `CONTACT_WEBHOOK_URL` remains server-only and must never appear in client
+  code, public bundles, screenshots, or public documentation with a value.
+- `.env.example` lists `CONTACT_WEBHOOK_URL=` without a secret value.
+- The production build must succeed without `CONTACT_WEBHOOK_URL`.
+- When the variable is absent at submission time, the API returns a generic
+  delivery-unavailable response.
+- The contact route uses `cache: no-store` for webhook delivery and
+  `Cache-Control: no-store` for JSON responses.
+- API routes are excluded from robots indexing and are not listed in the
+  sitemap.
+- Before launch, the owner must configure `CONTACT_WEBHOOK_URL` in the intended
+  Vercel environments and set `NEXT_PUBLIC_SITE_URL=https://jeremybrunet.com` if
+  the project configuration requires it.
