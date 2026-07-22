@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import './globals.css'
 
 import { siteConfig } from '@/lib/site-config'
+import { serializeJsonLd } from '@/lib/seo/json-ld'
 import { absoluteUrl, getCanonicalOrigin } from '@/lib/seo/urls'
 
 const canonicalOrigin = getCanonicalOrigin()
@@ -14,9 +15,6 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  alternates: {
-    canonical: absoluteUrl('/'),
-  },
   openGraph: {
     title: siteConfig.title,
     description: siteConfig.description,
@@ -58,7 +56,7 @@ export default function RootLayout({
       <body>
         <script
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(websiteStructuredData),
+            __html: serializeJsonLd(websiteStructuredData),
           }}
           type="application/ld+json"
         />

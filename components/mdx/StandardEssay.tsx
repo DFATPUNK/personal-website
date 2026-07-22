@@ -1,4 +1,5 @@
 import { getStandardEssayComponent } from '@/lib/mdx/essay-registry'
+import { serializeJsonLd } from '@/lib/seo/json-ld'
 import { absoluteUrl } from '@/lib/seo/urls'
 import { getTopicLabel } from '@/lib/topics/registry'
 import { formatEssayDate, type Essay } from '@/lib/content/essays'
@@ -79,7 +80,7 @@ export function StandardEssay({ essay }: { essay: Essay }) {
       </div>
       <script
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleStructuredData),
+          __html: serializeJsonLd(articleStructuredData),
         }}
         type="application/ld+json"
       />
