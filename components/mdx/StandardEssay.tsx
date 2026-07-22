@@ -1,4 +1,5 @@
 import { getStandardEssayComponent } from '@/lib/mdx/essay-registry'
+import { serializeJsonLd } from '@/lib/seo/json-ld'
 import { absoluteUrl } from '@/lib/seo/urls'
 import { getTopicLabel } from '@/lib/topics/registry'
 import { formatEssayDate, type Essay } from '@/lib/content/essays'
@@ -8,6 +9,17 @@ import { ShareControls } from './ShareControls'
 export function StandardEssay({ essay }: { essay: Essay }) {
   const Content = getStandardEssayComponent(essay.slug)
   const canonicalUrl = absoluteUrl(`/essays/${essay.slug}`)
+  const articleStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: essay.metadata.title,
+    description: essay.metadata.description,
+    datePublished: essay.metadata.publishedAt,
+    dateModified: essay.metadata.updatedAt ?? essay.metadata.publishedAt,
+    keywords: essay.metadata.tags,
+    mainEntityOfPage: canonicalUrl,
+    isAccessibleForFree: true,
+  }
 
   if (!Content) {
     throw new Error(`No standard MDX component registered for ${essay.slug}.`)
@@ -66,6 +78,12 @@ export function StandardEssay({ essay }: { essay: Essay }) {
       <div className="site-prose mb-12">
         <Content />
       </div>
+      <script
+        dangerouslySetInnerHTML={{
+          __html: serializeJsonLd(articleStructuredData),
+        }}
+        type="application/ld+json"
+      />
       <ShareControls title={essay.metadata.title} url={canonicalUrl} />
     </article>
   )

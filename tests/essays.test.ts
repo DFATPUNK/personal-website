@@ -11,6 +11,7 @@ import {
   getEssayBySlug,
   getEssayStaticParams,
   getPublishedEssays,
+  getPublicEssayEntries,
   validateEssayCollection,
   type Essay,
 } from '../lib/content/essays'
@@ -32,16 +33,26 @@ describe('essay content foundation', () => {
     expect(essayLayoutSchema.parse('immersive')).toBe('immersive')
   })
 
-  it('loads the sample essay from frontmatter', () => {
-    const essay = getEssayBySlug('foundation-sample')
+  it('loads the draft sample essay from frontmatter', () => {
+    const essay = getAllEssays().find(
+      (entry) => entry.slug === 'foundation-sample',
+    )
 
     expect(essay?.metadata.title).toBe('Foundation sample essay')
     expect(essay?.metadata.layout).toBe('standard')
+    expect(essay?.metadata.status).toBe('draft')
   })
 
-  it('exposes only published essays publicly', () => {
+  it('keeps the temporary sample essay out of public surfaces', () => {
     expect(getAllEssays()).toHaveLength(1)
-    expect(getPublishedEssays()).toHaveLength(1)
+    expect(getPublishedEssays()).toHaveLength(0)
+    expect(getPublicEssayEntries()).toHaveLength(0)
+    expect(getEssayBySlug('foundation-sample')).toBeUndefined()
+    expect(getEssayStaticParams()).toEqual([])
+  })
+
+  it('leaves unknown essay slugs private', () => {
+    expect(getEssayBySlug('unknown-essay')).toBeUndefined()
   })
 
   it('sorts published local essays in reverse chronological order', () => {
@@ -133,7 +144,7 @@ externalUrl: "https://example.com/essay"
       .map((essay) => ({ slug: essay.slug }))
 
     expect(staticParams).toEqual([{ slug: 'published-local' }])
-    expect(getEssayStaticParams()).toEqual([{ slug: 'foundation-sample' }])
+    expect(getEssayStaticParams()).toEqual([])
   })
 
   it('rejects frontmatter slug and filename mismatches', () => {
@@ -247,6 +258,30 @@ tags:
 
     expect(() => getAllEssaysFromDirectory(directory)).toThrow(
       /External essay entries require externalUrl/,
+    )
+  })
+
+  it('rejects unknown frontmatter fields', () => {
+    const directory = createEssayDirectory()
+
+    writeEssay(
+      directory,
+      'unknown-field.mdx',
+      `
+title: "Unknown field"
+slug: "unknown-field"
+description: "Invalid essay."
+publishedAt: "2026-01-01"
+status: "published"
+layout: "standard"
+tags:
+  - ai
+repositoryURL: "https://example.com/repo"
+`,
+    )
+
+    expect(() => getAllEssaysFromDirectory(directory)).toThrow(
+      /Unrecognized key\(s\) in object: 'repositoryURL'/,
     )
   })
 

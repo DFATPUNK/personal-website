@@ -1,12 +1,24 @@
+import type { Metadata } from 'next'
+
 import { PageHeader } from '@/components/ui/PageHeader'
 import { SectionRow } from '@/components/ui/SectionRow'
 import { academicsEmptyState } from '@/lib/content/academics'
 import { careerEmptyState } from '@/lib/content/career'
 import { profileContent } from '@/lib/content/profile'
 import { testimonialsEmptyState } from '@/lib/content/testimonials'
+import { absoluteUrl } from '@/lib/seo/urls'
 import { topics, type TopicSlug } from '@/lib/topics/registry'
 
 const topicLabels = new Map(topics.map((topic) => [topic.slug, topic.label]))
+
+export const metadata: Metadata = {
+  title: 'Technical Portfolio',
+  description:
+    'A minimal technical portfolio collecting profile structure, essays, demos, and contact paths for Jérémy Brunet.',
+  alternates: {
+    canonical: absoluteUrl('/'),
+  },
+}
 
 export default function HomePage() {
   const { introduction, career, academics, testimonials } = profileContent

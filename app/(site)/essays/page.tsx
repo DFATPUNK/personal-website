@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -6,11 +7,16 @@ import {
   getPublicEssayEntries,
 } from '@/lib/content/essays'
 import { getRegisteredImmersiveEssaySlugs } from '@/lib/mdx/essay-registry'
+import { absoluteUrl } from '@/lib/seo/urls'
 import { getTopicLabel } from '@/lib/topics/registry'
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Essays',
-  description: 'Technical essays by Jérémy Brunet.',
+  description:
+    'A chronological index for published local essays and verified external writing references.',
+  alternates: {
+    canonical: absoluteUrl('/essays'),
+  },
 }
 
 export default function EssaysPage() {

@@ -43,6 +43,16 @@ export async function generateMetadata({
     alternates: {
       canonical: absoluteUrl(`/essays/${essay.slug}`),
     },
+    keywords: essay.metadata.tags,
+    openGraph: {
+      title: essay.metadata.title,
+      description: essay.metadata.description,
+      type: 'article',
+      url: absoluteUrl(`/essays/${essay.slug}`),
+      publishedTime: essay.metadata.publishedAt,
+      modifiedTime: essay.metadata.updatedAt,
+      tags: essay.metadata.tags,
+    },
   }
 }
 
