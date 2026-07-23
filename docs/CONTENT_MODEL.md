@@ -8,7 +8,7 @@ The site must stay simple. Content is stored locally in the repository and rende
 
 ## Main content areas
 
-### 1. Who am I?
+### 1. About
 
 Static content rendered from a small typed data file.
 

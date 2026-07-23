@@ -14,14 +14,15 @@ const topicLabels = new Map(topics.map((topic) => [topic.slug, topic.label]))
 export const metadata: Metadata = {
   title: 'Technical Portfolio',
   description:
-    'A minimal technical portfolio collecting profile structure, essays, demos, and contact paths for Jérémy Brunet.',
+    'Jérémy Brunet builds API integrations, automation workflows, data architectures, and applied AI systems for complex work.',
   alternates: {
     canonical: absoluteUrl('/'),
   },
 }
 
 export default function HomePage() {
-  const { introduction, career, academics, testimonials } = profileContent
+  const { introduction, career, previousRoles, academics, testimonials } =
+    profileContent
 
   return (
     <>
@@ -55,6 +56,20 @@ export default function HomePage() {
                 <LinkList links={entry.links} />
               </article>
             ))}
+            {previousRoles.length > 0 ? (
+              <div className="border-l-2 border-[var(--border)] pl-4 text-sm text-[var(--muted-foreground)]">
+                <p className="font-medium text-[var(--foreground)]">
+                  Previous roles include:
+                </p>
+                <ul className="mt-2 space-y-1">
+                  {previousRoles.map((entry) => (
+                    <li key={entry.id}>
+                      {entry.role} at {entry.organization}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
           </div>
         ) : (
           <EmptyState
@@ -80,7 +95,7 @@ export default function HomePage() {
                 <LinkList
                   links={[
                     ...(entry.url
-                      ? [{ href: entry.url, label: 'Reference' }]
+                      ? [{ href: entry.url, label: 'See certificate' }]
                       : []),
                     ...(entry.links ?? []),
                   ]}
@@ -101,7 +116,11 @@ export default function HomePage() {
             {testimonials.map((testimonial) => (
               <figure key={testimonial.id} className="space-y-3">
                 <blockquote className="border-l-2 border-[var(--border)] pl-4 text-[var(--foreground)]">
-                  {testimonial.quote}
+                  <div className="space-y-4">
+                    {testimonial.quote.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </div>
                 </blockquote>
                 <figcaption className="text-sm text-[var(--muted-foreground)]">
                   {testimonial.author}
@@ -111,13 +130,6 @@ export default function HomePage() {
                     : ''}
                 </figcaption>
                 <TopicList tags={testimonial.tags} />
-                {testimonial.sourceUrl ? (
-                  <LinkList
-                    links={[
-                      { href: testimonial.sourceUrl, label: 'Source' },
-                    ]}
-                  />
-                ) : null}
               </figure>
             ))}
           </div>
@@ -161,13 +173,22 @@ function LinkList({
     <ul className="space-y-1 text-sm">
       {links.map((link) => (
         <li key={link.href}>
-          <a className="border-b border-[var(--border)]" href={link.href}>
+          <a
+            className="border-b border-[var(--border)]"
+            href={link.href}
+            rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
+            target={isExternalUrl(link.href) ? '_blank' : undefined}
+          >
             {link.label}
           </a>
         </li>
       ))}
     </ul>
   )
+}
+
+function isExternalUrl(href: string) {
+  return /^https?:\/\//.test(href)
 }
 
 function EmptyState({

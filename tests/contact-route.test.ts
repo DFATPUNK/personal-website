@@ -106,7 +106,7 @@ describe('contact route', () => {
 
     expect(response.status).toBe(422)
     expect(body.ok).toBe(false)
-    expect(topicError).toBe('Please select a reason for contact.')
+    expect(topicError).toBe('Please select a subject.')
     expect(JSON.stringify(body)).not.toContain('Invalid enum')
     expect(JSON.stringify(body)).not.toContain('need-help')
     expect(mockedDeliverContactSubmission).not.toHaveBeenCalled()

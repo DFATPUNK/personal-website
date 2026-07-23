@@ -93,9 +93,6 @@ export function SiteNavigation() {
           {isOpen ? <X aria-hidden size={18} /> : <Menu aria-hidden size={18} />}
         </button>
         <div className="mt-12 hidden lg:block">
-          <p className="mb-8 max-w-36 text-xs leading-6 text-[var(--muted-foreground)]">
-            Jérémy Brunet. Technical portfolio, essays, and demos.
-          </p>
           <nav aria-label="Primary navigation">{renderLinks()}</nav>
         </div>
       </div>

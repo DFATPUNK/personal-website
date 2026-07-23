@@ -13,6 +13,10 @@ const httpUrlSchema = z.string().url().refine((value) => {
   return protocol === 'http:' || protocol === 'https:'
 }, 'Use an HTTP or HTTPS URL.')
 
+const externalPathSchema = z
+  .string()
+  .regex(/^\/(?!\/)/, 'External paths must begin with a single /.')
+
 export const demoSchema = z
   .object({
     slug: z
@@ -23,7 +27,8 @@ export const demoSchema = z
     shortDescription: z.string().min(1),
     description: z.array(z.string().min(1)).min(1),
     status: z.enum(demoStatuses),
-    externalPath: z.string().regex(/^\//, 'External paths must begin with /.').optional(),
+    externalPath: externalPathSchema.optional(),
+    externalUrl: httpUrlSchema.optional(),
     repositoryUrl: httpUrlSchema.optional(),
     documentationUrl: httpUrlSchema.optional(),
     tags: z.array(topicSlugSchema).min(1),
@@ -31,11 +36,22 @@ export const demoSchema = z
     order: z.number().int().nonnegative(),
   })
   .superRefine((demo, context) => {
-    if (demo.status === 'live' && !demo.externalPath) {
+    const hasExternalPath = Boolean(demo.externalPath)
+    const hasExternalUrl = Boolean(demo.externalUrl)
+
+    if (hasExternalPath && hasExternalUrl) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['externalUrl'],
+        message: 'Use either externalPath or externalUrl, not both.',
+      })
+    }
+
+    if (demo.status === 'live' && !hasExternalPath && !hasExternalUrl) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['externalPath'],
-        message: 'Live demos require an external path.',
+        message: 'Live demos require exactly one external destination.',
       })
     }
   })
@@ -62,7 +78,7 @@ const demoEntries = [
     externalPath: '/alan',
     repositoryUrl: 'https://github.com/DFATPUNK/hr-onboarding-engine',
     documentationUrl: 'https://writebook.jeremybrunet.com/3/alan.com',
-    tags: ['automations', 'event-driven-architecture', 'apis', 'data'],
+    tags: ['automations', 'database', 'hr'],
     featured: true,
     order: 10,
   },
@@ -78,7 +94,7 @@ const demoEntries = [
     status: 'live',
     externalPath: '/balatro',
     repositoryUrl: 'https://github.com/DFATPUNK/balatro-card-generator',
-    tags: ['react'],
+    tags: ['figma'],
     order: 20,
   },
   {
@@ -93,8 +109,23 @@ const demoEntries = [
     externalPath: '/pg-calculator',
     repositoryUrl: 'https://github.com/DFATPUNK/pg-calculator',
     documentationUrl: 'https://writebook.jeremybrunet.com/5/pg-calculator',
-    tags: ['python'],
+    tags: ['ai', 'llm', 'python'],
     order: 30,
+  },
+  {
+    slug: 'mlp',
+    title: 'MLP — Machine Learning Pipeline Builder',
+    shortDescription:
+      'A no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
+    description: [
+      'MLP is a no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
+      'This catalog entry links to the public application and source repository without embedding, proxying, or modifying the external project.',
+    ],
+    status: 'live',
+    externalUrl: 'https://mlp.jeremybrunet.com/',
+    repositoryUrl: 'https://github.com/DFATPUNK/mlp',
+    tags: ['machine-learning', 'ai', 'data', 'react', 'apis'],
+    order: 40,
   },
 ] satisfies readonly DemoInput[]
 
@@ -158,12 +189,18 @@ export function getDemoInternalPath(demo: Pick<Demo, 'slug'>) {
   return `/demos/${demo.slug}` as const
 }
 
-export function getDemoExternalUrl(demo: Pick<Demo, 'externalPath'>) {
-  if (!demo.externalPath) {
-    return undefined
+export function getDemoExternalUrl(
+  demo: Pick<Demo, 'externalPath' | 'externalUrl'>,
+) {
+  if (demo.externalUrl) {
+    return demo.externalUrl
   }
 
-  return new URL(demo.externalPath, demosBaseUrl).toString()
+  if (demo.externalPath) {
+    return new URL(demo.externalPath, demosBaseUrl).toString()
+  }
+
+  return undefined
 }
 
 export function getDemoStaticParams() {

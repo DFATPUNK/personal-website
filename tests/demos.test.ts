@@ -18,6 +18,7 @@ describe('demo registry', () => {
       'alan',
       'balatro',
       'pg-calculator',
+      'mlp',
     ])
   })
 
@@ -38,15 +39,16 @@ describe('demo registry', () => {
   })
 
   it('keeps ordering deterministic', () => {
-    expect(getAllDemos().map((demo) => demo.order)).toEqual([10, 20, 30])
+    expect(getAllDemos().map((demo) => demo.order)).toEqual([10, 20, 30, 40])
     expect(getAllDemos().map((demo) => demo.slug)).toEqual([
       'alan',
       'balatro',
       'pg-calculator',
+      'mlp',
     ])
   })
 
-  it('requires live demos to expose slash-prefixed external paths', () => {
+  it('requires live demos to expose exactly one external destination', () => {
     expect(() =>
       validateDemoCollection([
         {
@@ -59,7 +61,7 @@ describe('demo registry', () => {
           order: 1,
         },
       ]),
-    ).toThrow(/Live demos require an external path/)
+    ).toThrow(/exactly one external destination/)
 
     expect(() =>
       validateDemoCollection([
@@ -75,6 +77,37 @@ describe('demo registry', () => {
         },
       ]),
     ).toThrow(/External paths must begin/)
+
+    expect(() =>
+      validateDemoCollection([
+        {
+          slug: 'both-destinations',
+          title: 'Both destinations',
+          shortDescription: 'Invalid destination.',
+          description: ['Invalid destination.'],
+          status: 'live',
+          externalPath: '/both-destinations',
+          externalUrl: 'https://example.com/both-destinations',
+          tags: ['ai'],
+          order: 1,
+        },
+      ]),
+    ).toThrow(/either externalPath or externalUrl/)
+
+    expect(() =>
+      validateDemoCollection([
+        {
+          slug: 'relative-url',
+          title: 'Relative URL',
+          shortDescription: 'Invalid destination.',
+          description: ['Invalid destination.'],
+          status: 'live',
+          externalUrl: '/relative-url',
+          tags: ['ai'],
+          order: 1,
+        },
+      ]),
+    ).toThrow(/Invalid URL/)
   })
 
   it('derives external URLs from the approved demos host', () => {
@@ -83,6 +116,21 @@ describe('demo registry', () => {
     expect(demosBaseUrl).toBe('https://demos.jeremybrunet.com')
     expect(alan ? getDemoExternalUrl(alan) : undefined).toBe(
       'https://demos.jeremybrunet.com/alan',
+    )
+    expect(getDemoExternalUrl(getDemoBySlug('balatro')!)).toBe(
+      'https://demos.jeremybrunet.com/balatro',
+    )
+    expect(getDemoExternalUrl(getDemoBySlug('pg-calculator')!)).toBe(
+      'https://demos.jeremybrunet.com/pg-calculator',
+    )
+  })
+
+  it('uses the MLP standalone host when a demo supplies externalUrl', () => {
+    const mlp = getDemoBySlug('mlp')
+
+    expect(mlp?.repositoryUrl).toBe('https://github.com/DFATPUNK/mlp')
+    expect(mlp ? getDemoExternalUrl(mlp) : undefined).toBe(
+      'https://mlp.jeremybrunet.com/',
     )
   })
 
@@ -126,6 +174,27 @@ describe('demo registry', () => {
     ).toThrow(/Invalid enum/)
   })
 
+  it('keeps approved demo topic ordering', () => {
+    expect(getDemoBySlug('pg-calculator')?.tags).toEqual([
+      'ai',
+      'llm',
+      'python',
+    ])
+    expect(getDemoBySlug('balatro')?.tags).toEqual(['figma'])
+    expect(getDemoBySlug('alan')?.tags).toEqual([
+      'automations',
+      'database',
+      'hr',
+    ])
+    expect(getDemoBySlug('mlp')?.tags).toEqual([
+      'machine-learning',
+      'ai',
+      'data',
+      'react',
+      'apis',
+    ])
+  })
+
   it('looks up public demos by canonical slug', () => {
     expect(getDemoBySlug('balatro')?.title).toBe('Balatro Joker Generator')
     expect(getDemoBySlug('zero-touch-onboarding')).toBeUndefined()
@@ -139,11 +208,13 @@ describe('demo registry', () => {
       '/demos/alan',
       '/demos/balatro',
       '/demos/pg-calculator',
+      '/demos/mlp',
     ])
     expect(getDemoStaticParams()).toEqual([
       { slug: 'alan' },
       { slug: 'balatro' },
       { slug: 'pg-calculator' },
+      { slug: 'mlp' },
     ])
   })
 

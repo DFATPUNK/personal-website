@@ -27,6 +27,11 @@ type ContactFormInput = {
 
 The public endpoint returns structured JSON with generic messages. Validation errors may include field-level messages. Delivery failures do not expose webhook status text, response bodies, environment variable names, or stack traces.
 
+The public form labels the `topic` field as `Subject`. The empty option is
+`Select a subject`, and validation copy must say `Please select a subject.` or
+`Please select a valid subject.`. The internal field name and outbound payload
+remain `topic`.
+
 ## Normalization
 
 Before delivery, the server trims the email and topic, lowercases the email address, normalizes line endings to `\n`, trims leading and trailing message whitespace, and collapses four or more consecutive newline characters to three. Empty interview-date strings are omitted.
@@ -97,3 +102,10 @@ Do not send personal test messages to a real webhook. Use tests with mocked `fet
 - Before launch, the owner must configure `CONTACT_WEBHOOK_URL` in the intended
   Vercel environments and set `NEXT_PUBLIC_SITE_URL=https://jeremybrunet.com` if
   the project configuration requires it.
+
+## Current content-copy notes
+
+- `Need your help` asks `Where are you stuck?` and includes a collapsed native
+  `<details>` example for a realistic HR workflow.
+- `Job offer` asks for role and team context, and the optional date label is
+  `When would you like to meet?`.

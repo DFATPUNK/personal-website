@@ -57,7 +57,11 @@ export default function EssaysPage() {
                 </div>
                 <h2 className="text-xl font-semibold leading-tight sm:text-2xl">
                   {isExternal ? (
-                    <a href={externalHref} rel="noreferrer" target="_blank">
+                    <a
+                      href={externalHref}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
                       {essay.metadata.title}
                     </a>
                   ) : (
