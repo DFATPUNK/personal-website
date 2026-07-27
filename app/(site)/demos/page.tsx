@@ -40,23 +40,26 @@ export default function DemosPage() {
               <li className="list-none" key={demo.slug}>
                 <article className="border-b border-[var(--border)] pb-8">
                   <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--muted-foreground)]">
-                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--secondary-accent)]">
+                    <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
                       {demo.status}
                     </span>
                     <ul className="flex flex-wrap gap-2">
                       {demo.tags.map((tag) => (
-                        <li className="text-xs" key={tag}>
+                        <li
+                          className="border border-[var(--border)] px-2 py-1 text-xs text-[#666666]"
+                          key={tag}
+                        >
                           {getTopicLabel(tag)}
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <h2 className="text-xl font-semibold leading-tight sm:text-2xl">
+                  <h2 className="text-lg font-normal leading-snug sm:text-xl">
                     <Link href={getDemoInternalPath(demo)}>{demo.title}</Link>
                   </h2>
 
-                  <p className="mt-3 leading-7 text-[var(--muted-foreground)]">
+                  <p className="mt-3 leading-[1.6] text-[var(--muted-foreground)]">
                     {demo.shortDescription}
                   </p>
 

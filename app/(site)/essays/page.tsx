@@ -50,12 +50,12 @@ export default function EssaysPage() {
                     </time>
                   ) : null}
                   {isExternal ? (
-                    <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--secondary-accent)]">
+                    <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
                       External
                     </span>
                   ) : null}
                 </div>
-                <h2 className="text-xl font-semibold leading-tight sm:text-2xl">
+                <h2 className="text-lg font-normal leading-snug sm:text-xl">
                   {isExternal ? (
                     <a
                       href={externalHref}
@@ -68,14 +68,14 @@ export default function EssaysPage() {
                     <Link href={essayHref}>{essay.metadata.title}</Link>
                   )}
                 </h2>
-                <p className="mt-3 leading-7 text-[var(--muted-foreground)]">
+                <p className="mt-3 leading-[1.6] text-[var(--muted-foreground)]">
                   {essay.metadata.description}
                 </p>
                 {essay.metadata.tags.length > 0 ? (
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {essay.metadata.tags.map((tag) => (
                       <li
-                        className="text-xs text-[var(--muted-foreground)]"
+                        className="border border-[var(--border)] px-2 py-1 text-xs text-[#666666]"
                         key={tag}
                       >
                         {getTopicLabel(tag)}

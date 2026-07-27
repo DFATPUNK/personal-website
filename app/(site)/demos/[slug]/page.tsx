@@ -67,12 +67,15 @@ export default async function DemoPage({ params }: DemoPageProps) {
       />
 
       <div className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-[var(--muted-foreground)]">
-        <span className="text-xs font-semibold uppercase tracking-[0.08em] text-[var(--secondary-accent)]">
+        <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
           {demo.status}
         </span>
         <ul className="flex flex-wrap gap-2">
           {demo.tags.map((tag) => (
-            <li className="text-xs" key={tag}>
+            <li
+              className="border border-[var(--border)] px-2 py-1 text-xs text-[#666666]"
+              key={tag}
+            >
               {getTopicLabel(tag)}
             </li>
           ))}
