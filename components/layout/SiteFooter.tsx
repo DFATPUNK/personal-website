@@ -12,7 +12,8 @@ export function SiteFooter() {
           <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <li>
               <Link
-                className="inline-flex items-center gap-1.5 hover:text-[var(--foreground)]"
+                aria-label="Contact"
+                className="inline-flex size-8 items-center justify-center hover:text-[var(--foreground)]"
                 href="/contact"
               >
                 <Mail aria-hidden size={16} strokeWidth={1.8} />
