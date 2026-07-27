@@ -39,6 +39,31 @@ Change `status: draft` to `status: published`, add `publishedAt` in
 `YYYY-MM-DD` format, optionally add `updatedAt`, verify the registry import, and
 check `/essays/[slug]`, `/essays`, and `sitemap.xml`.
 
+## Announce an in-progress essay
+
+Use `status: in-progress`, add `announcedAt`, write only a short context page,
+and optionally add `interestSource` for the publication-alert form.
+
+```mdx
+---
+title: "My exact provisional title"
+slug: "my-essay-slug"
+description: "One concise sentence."
+announcedAt: "2026-07-27"
+status: "in-progress"
+layout: "standard"
+tags:
+  - automations
+interestSource: "essay:my-essay-slug"
+---
+```
+
+In-progress essays are public, included in static params, and rendered with
+`noindex, follow`. They are excluded from the sitemap and do not emit published
+Article JSON-LD. To publish later, change the status to `published`, add
+`publishedAt`, review the page content as the finished essay, and verify the
+sitemap and structured data.
+
 ## Add an external essay reference
 
 Use `status: external`, include `externalUrl`, a date, and registered topic
@@ -95,9 +120,17 @@ MLP example:
   externalUrl: 'https://mlp.jeremybrunet.com/',
   repositoryUrl: 'https://github.com/DFATPUNK/mlp',
   tags: ['machine-learning', 'ai', 'data', 'react', 'apis'],
-  order: 40,
+  availability: {
+    provider: 'supabase',
+    key: 'mlp',
+  },
+  order: 10,
 }
 ```
+
+Only Alan and MLP currently use Supabase availability. Use the safe logical
+keys `alan` and `mlp`; never add provider refs, anon keys, access tokens, n8n
+URLs, or secrets to the registry.
 
 ## Verification commands
 

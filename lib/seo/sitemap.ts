@@ -15,9 +15,11 @@ function essayLastModified(essay: Essay) {
 }
 
 export function getSitemapEntries(): MetadataRoute.Sitemap {
-  const staticRoutes = ['/', '/essays', '/demos', '/contact'].map((route) => ({
-    url: absoluteUrl(route),
-  }))
+  const staticRoutes = ['/', '/essays', '/demos', '/contact', '/privacy'].map(
+    (route) => ({
+      url: absoluteUrl(route),
+    }),
+  )
 
   const essayRoutes = getPublishedEssays().map((essay) => ({
     url: absoluteUrl(`/essays/${essay.slug}`),

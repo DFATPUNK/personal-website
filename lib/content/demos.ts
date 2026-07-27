@@ -4,8 +4,21 @@ import { siteConfig } from '@/lib/site-config'
 import { topicSlugSchema, type TopicSlug } from '@/lib/topics/registry'
 
 export const demoStatuses = ['live', 'planned', 'archived'] as const
+export const demoAvailabilityProviders = ['supabase'] as const
+export const demoAvailabilityKeys = ['alan', 'mlp'] as const
 
 export type DemoStatus = (typeof demoStatuses)[number]
+export type DemoAvailabilityProvider = (typeof demoAvailabilityProviders)[number]
+export type DemoAvailabilityKey = (typeof demoAvailabilityKeys)[number]
+
+export const demoAvailabilityKeySchema = z.enum(demoAvailabilityKeys)
+
+const demoAvailabilitySchema = z
+  .object({
+    provider: z.enum(demoAvailabilityProviders),
+    key: demoAvailabilityKeySchema,
+  })
+  .strict()
 
 const httpUrlSchema = z.string().url().refine((value) => {
   const protocol = new URL(value).protocol
@@ -34,6 +47,7 @@ export const demoSchema = z
     tags: z.array(topicSlugSchema).min(1),
     featured: z.boolean().optional(),
     order: z.number().int().nonnegative(),
+    availability: demoAvailabilitySchema.optional(),
   })
   .superRefine((demo, context) => {
     const hasExternalPath = Boolean(demo.externalPath)
@@ -66,36 +80,23 @@ export const demosBaseUrl = siteConfig.demosBaseUrl
 
 const demoEntries = [
   {
-    slug: 'alan',
-    title: 'Zero-Touch Onboarding / Alan',
+    slug: 'mlp',
+    title: 'MLP — Machine Learning Pipeline Builder',
     shortDescription:
-      'An event-driven HR onboarding proof of concept with explicit status handling.',
+      'A no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
     description: [
-      'This proof of concept models employee onboarding as a deterministic process that begins from a hiring event.',
-      'The source project describes standard, flagged, and partial onboarding scenarios, with audit-oriented run and step tracking.',
+      'MLP is a no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
+      'This catalog entry links to the public application and source repository without embedding, proxying, or modifying the external project.',
     ],
     status: 'live',
-    externalPath: '/alan',
-    repositoryUrl: 'https://github.com/DFATPUNK/hr-onboarding-engine',
-    documentationUrl: 'https://writebook.jeremybrunet.com/3/alan.com',
-    tags: ['automations', 'database', 'hr'],
-    featured: true,
+    externalUrl: 'https://mlp.jeremybrunet.com/',
+    repositoryUrl: 'https://github.com/DFATPUNK/mlp',
+    tags: ['machine-learning', 'ai', 'data', 'react', 'apis'],
+    availability: {
+      provider: 'supabase',
+      key: 'mlp',
+    },
     order: 10,
-  },
-  {
-    slug: 'balatro',
-    title: 'Balatro Joker Generator',
-    shortDescription:
-      'A desktop-oriented generator for composing custom Joker card images.',
-    description: [
-      'This demo lets visitors assemble a custom Joker card image from selectable visual assets and export the result as a PNG.',
-      'The source README credits a public Figma community asset source. This catalog entry does not imply affiliation with Balatro, its creators, or its publishers.',
-    ],
-    status: 'live',
-    externalPath: '/balatro',
-    repositoryUrl: 'https://github.com/DFATPUNK/balatro-card-generator',
-    tags: ['figma'],
-    order: 20,
   },
   {
     slug: 'pg-calculator',
@@ -110,21 +111,42 @@ const demoEntries = [
     repositoryUrl: 'https://github.com/DFATPUNK/pg-calculator',
     documentationUrl: 'https://writebook.jeremybrunet.com/5/pg-calculator',
     tags: ['ai', 'llm', 'python'],
+    order: 20,
+  },
+  {
+    slug: 'alan',
+    title: 'Zero-Touch Onboarding / Alan',
+    shortDescription:
+      'An event-driven HR onboarding proof of concept with explicit status handling.',
+    description: [
+      'This proof of concept models employee onboarding as a deterministic process that begins from a hiring event.',
+      'The source project describes standard, flagged, and partial onboarding scenarios, with audit-oriented run and step tracking.',
+    ],
+    status: 'live',
+    externalPath: '/alan',
+    repositoryUrl: 'https://github.com/DFATPUNK/hr-onboarding-engine',
+    documentationUrl: 'https://writebook.jeremybrunet.com/3/alan.com',
+    tags: ['automations', 'database', 'hr'],
+    featured: true,
+    availability: {
+      provider: 'supabase',
+      key: 'alan',
+    },
     order: 30,
   },
   {
-    slug: 'mlp',
-    title: 'MLP — Machine Learning Pipeline Builder',
+    slug: 'balatro',
+    title: 'Balatro Joker Generator',
     shortDescription:
-      'A no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
+      'A desktop-oriented generator for composing custom Joker card images.',
     description: [
-      'MLP is a no-code proof of concept for assembling small machine-learning pipelines from typed, reusable steps and artifacts.',
-      'This catalog entry links to the public application and source repository without embedding, proxying, or modifying the external project.',
+      'This demo lets visitors assemble a custom Joker card image from selectable visual assets and export the result as a PNG.',
+      'The source README credits a public Figma community asset source. This catalog entry does not imply affiliation with Balatro, its creators, or its publishers.',
     ],
     status: 'live',
-    externalUrl: 'https://mlp.jeremybrunet.com/',
-    repositoryUrl: 'https://github.com/DFATPUNK/mlp',
-    tags: ['machine-learning', 'ai', 'data', 'react', 'apis'],
+    externalPath: '/balatro',
+    repositoryUrl: 'https://github.com/DFATPUNK/balatro-card-generator',
+    tags: ['figma'],
     order: 40,
   },
 ] satisfies readonly DemoInput[]
@@ -205,4 +227,14 @@ export function getDemoExternalUrl(
 
 export function getDemoStaticParams() {
   return getPublicDemos().map((demo) => ({ slug: demo.slug }))
+}
+
+export function isDemoAvailabilityKey(
+  value: string,
+): value is DemoAvailabilityKey {
+  return demoAvailabilityKeys.includes(value as DemoAvailabilityKey)
+}
+
+export function getAvailabilityDemos() {
+  return getPublicDemos().filter((demo) => demo.availability)
 }

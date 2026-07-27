@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 
 import { PageHeader } from '@/components/ui/PageHeader'
+import { PublicationAlertForm } from '@/components/ui/PublicationAlertForm'
 import {
   formatEssayDate,
+  getEssaySortDate,
   getPublicEssayEntries,
 } from '@/lib/content/essays'
 import { getRegisteredImmersiveEssaySlugs } from '@/lib/mdx/essay-registry'
@@ -35,8 +37,10 @@ export default function EssaysPage() {
         <div className="space-y-8">
           {essays.map((essay) => {
             const isExternal = essay.metadata.status === 'external'
+            const isInProgress = essay.metadata.status === 'in-progress'
             const essayHref = `/essays/${essay.slug}`
             const externalHref = essay.metadata.externalUrl ?? essayHref
+            const sortDate = getEssaySortDate(essay)
 
             return (
               <article
@@ -44,14 +48,19 @@ export default function EssaysPage() {
                 key={essay.slug}
               >
                 <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--muted-foreground)]">
-                  {essay.metadata.publishedAt ? (
-                    <time dateTime={essay.metadata.publishedAt}>
-                      {formatEssayDate(essay.metadata.publishedAt)}
+                  {sortDate ? (
+                    <time dateTime={sortDate}>
+                      {formatEssayDate(sortDate)}
                     </time>
                   ) : null}
                   {isExternal ? (
                     <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
                       External
+                    </span>
+                  ) : null}
+                  {isInProgress ? (
+                    <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
+                      In progress
                     </span>
                   ) : null}
                 </div>
@@ -71,6 +80,16 @@ export default function EssaysPage() {
                 <p className="mt-3 leading-[1.6] text-[var(--muted-foreground)]">
                   {essay.metadata.description}
                 </p>
+                {isInProgress ? (
+                  <div className="mt-4">
+                    <Link
+                      className="font-medium text-[var(--accent)]"
+                      href={essayHref}
+                    >
+                      Read context
+                    </Link>
+                  </div>
+                ) : null}
                 {essay.metadata.tags.length > 0 ? (
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {essay.metadata.tags.map((tag) => (
@@ -82,6 +101,14 @@ export default function EssaysPage() {
                       </li>
                     ))}
                   </ul>
+                ) : null}
+                {isInProgress && essay.metadata.interestSource ? (
+                  <div className="mt-5">
+                    <PublicationAlertForm
+                      compact
+                      source={essay.metadata.interestSource}
+                    />
+                  </div>
                 ) : null}
               </article>
             )

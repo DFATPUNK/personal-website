@@ -15,6 +15,8 @@ This checklist tracks human-supplied content required before `v2` is merged to
 - Demo wording/topic review for the existing public demos.
 - MLP public demo entry.
 - Contact-page copy review, including the subject selector and HR example.
+- In-progress flagship essay announcement and context page.
+- Reusable publication-alert signup form for major essays and demos.
 
 ## Still required before release
 
@@ -23,6 +25,11 @@ This checklist tracks human-supplied content required before `v2` is merged to
 - Removal or continued non-publication of the temporary `foundation-sample`
   essay.
 - Vercel `CONTACT_WEBHOOK_URL` production configuration if still unset.
+- Vercel demo availability webhook URLs and signing secret.
+- Vercel publication-alert webhook URL and signing secret.
+- n8n Supabase Management API, Alan/MLP project refs, health-check URLs and
+  anon keys, Mailchimp Marketing API credential, server prefix, Audience ID,
+  and matching signing secrets.
 - Final review of the `v2 -> main` release PR.
 - Any unresolved defects found during final QA.
 

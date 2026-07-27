@@ -6,9 +6,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   essayLayoutSchema,
+  essayStatusSchema,
   getAllEssays,
   getAllEssaysFromDirectory,
   getEssayBySlug,
+  getEssaySortDate,
   getEssayStaticParams,
   getPublishedEssays,
   getPublicEssayEntries,
@@ -31,6 +33,7 @@ describe('essay content foundation', () => {
   it('validates both declared layout values', () => {
     expect(essayLayoutSchema.parse('standard')).toBe('standard')
     expect(essayLayoutSchema.parse('immersive')).toBe('immersive')
+    expect(essayStatusSchema.parse('in-progress')).toBe('in-progress')
   })
 
   it('loads the draft sample essay from frontmatter', () => {
@@ -44,11 +47,38 @@ describe('essay content foundation', () => {
   })
 
   it('keeps the temporary sample essay out of public local surfaces', () => {
-    expect(getAllEssays()).toHaveLength(4)
+    expect(getAllEssays()).toHaveLength(5)
     expect(getPublishedEssays()).toHaveLength(0)
-    expect(getPublicEssayEntries()).toHaveLength(3)
+    expect(getPublicEssayEntries()).toHaveLength(4)
     expect(getEssayBySlug('foundation-sample')).toBeUndefined()
-    expect(getEssayStaticParams()).toEqual([])
+    expect(getEssayStaticParams()).toEqual([
+      { slug: 'how-to-manage-automations-event-driven-database' },
+    ])
+  })
+
+  it('publishes the in-progress essay as the first public entry', () => {
+    const [essay] = getPublicEssayEntries()
+
+    expect(essay?.slug).toBe(
+      'how-to-manage-automations-event-driven-database',
+    )
+    expect(essay?.metadata.title).toBe(
+      'How to manage automations to build an event-driven database? A full, comprehensive walkthrough to design a complete automated data collection system.',
+    )
+    expect(essay?.metadata.status).toBe('in-progress')
+    expect(essay?.metadata.announcedAt).toBe('2026-07-27')
+    expect(essay?.metadata.publishedAt).toBeUndefined()
+    expect(essay ? getEssaySortDate(essay) : undefined).toBe('2026-07-27')
+    expect(essay?.metadata.interestSource).toBe(
+      'essay:event-driven-database',
+    )
+    expect(essay?.metadata.tags).toEqual([
+      'automations',
+      'airtable',
+      'data',
+      'event-driven-architecture',
+      'apis',
+    ])
   })
 
   it('publishes the expected external Medium references', () => {
@@ -135,7 +165,7 @@ tags:
     ])
   })
 
-  it('excludes drafts and external entries from static params', () => {
+  it('includes in-progress entries and excludes drafts and external entries from static params', () => {
     const directory = createEssayDirectory()
 
     writeEssay(
@@ -167,6 +197,20 @@ tags:
     )
     writeEssay(
       directory,
+      'in-progress-local.mdx',
+      `
+title: "In progress local"
+slug: "in-progress-local"
+description: "Context page."
+announcedAt: "2026-07-27"
+status: "in-progress"
+layout: "standard"
+tags:
+  - automations
+`,
+    )
+    writeEssay(
+      directory,
       'external-entry.mdx',
       `
 title: "External entry"
@@ -182,11 +226,18 @@ externalUrl: "https://example.com/essay"
 
     const essays = getAllEssaysFromDirectory(directory)
     const staticParams = essays
-      .filter((essay) => essay.metadata.status === 'published')
+      .filter((essay) =>
+        ['published', 'in-progress'].includes(essay.metadata.status),
+      )
       .map((essay) => ({ slug: essay.slug }))
 
-    expect(staticParams).toEqual([{ slug: 'published-local' }])
-    expect(getEssayStaticParams()).toEqual([])
+    expect(staticParams).toEqual([
+      { slug: 'in-progress-local' },
+      { slug: 'published-local' },
+    ])
+    expect(getEssayStaticParams()).toEqual([
+      { slug: 'how-to-manage-automations-event-driven-database' },
+    ])
   })
 
   it('rejects frontmatter slug and filename mismatches', () => {
@@ -278,6 +329,28 @@ tags:
 
     expect(() => getAllEssaysFromDirectory(directory)).toThrow(
       /Published essays require publishedAt/,
+    )
+  })
+
+  it('requires announcedAt for in-progress essays', () => {
+    const directory = createEssayDirectory()
+
+    writeEssay(
+      directory,
+      'missing-announced-date.mdx',
+      `
+title: "Missing announced date"
+slug: "missing-announced-date"
+description: "Invalid essay."
+status: "in-progress"
+layout: "standard"
+tags:
+  - automations
+`,
+    )
+
+    expect(() => getAllEssaysFromDirectory(directory)).toThrow(
+      /In-progress essays require announcedAt/,
     )
   })
 

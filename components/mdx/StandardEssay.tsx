@@ -1,14 +1,17 @@
 import { getStandardEssayComponent } from '@/lib/mdx/essay-registry'
+import { PublicationAlertForm } from '@/components/ui/PublicationAlertForm'
 import { serializeJsonLd } from '@/lib/seo/json-ld'
 import { absoluteUrl } from '@/lib/seo/urls'
 import { getTopicLabel } from '@/lib/topics/registry'
-import { formatEssayDate, type Essay } from '@/lib/content/essays'
+import { formatEssayDate, getEssaySortDate, type Essay } from '@/lib/content/essays'
 
 import { ShareControls } from './ShareControls'
 
 export function StandardEssay({ essay }: { essay: Essay }) {
   const Content = getStandardEssayComponent(essay.slug)
   const canonicalUrl = absoluteUrl(`/essays/${essay.slug}`)
+  const isInProgress = essay.metadata.status === 'in-progress'
+  const displayDate = getEssaySortDate(essay)
   const articleStructuredData = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -38,12 +41,17 @@ export function StandardEssay({ essay }: { essay: Essay }) {
           {essay.metadata.description}
         </p>
         <div className="mt-5 space-y-3 text-sm text-[var(--muted-foreground)]">
-          {essay.metadata.publishedAt ? (
+          {displayDate ? (
             <p>
-              Published{' '}
-              <time dateTime={essay.metadata.publishedAt}>
-                {formatEssayDate(essay.metadata.publishedAt)}
+              {isInProgress ? 'Announced' : 'Published'}{' '}
+              <time dateTime={displayDate}>
+                {formatEssayDate(displayDate)}
               </time>
+            </p>
+          ) : null}
+          {isInProgress ? (
+            <p className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
+              In progress
             </p>
           ) : null}
           {essay.metadata.updatedAt ? (
@@ -83,13 +91,22 @@ export function StandardEssay({ essay }: { essay: Essay }) {
       <div className="site-prose mb-12">
         <Content />
       </div>
-      <script
-        dangerouslySetInnerHTML={{
-          __html: serializeJsonLd(articleStructuredData),
-        }}
-        type="application/ld+json"
-      />
-      <ShareControls title={essay.metadata.title} url={canonicalUrl} />
+      {isInProgress && essay.metadata.interestSource ? (
+        <div className="mb-12 border-t border-[var(--border)] pt-6">
+          <PublicationAlertForm source={essay.metadata.interestSource} />
+        </div>
+      ) : null}
+      {isInProgress ? null : (
+        <script
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(articleStructuredData),
+          }}
+          type="application/ld+json"
+        />
+      )}
+      {isInProgress ? null : (
+        <ShareControls title={essay.metadata.title} url={canonicalUrl} />
+      )}
     </article>
   )
 }

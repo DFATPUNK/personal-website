@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
+import { DemoAvailabilityClient } from '@/components/ui/DemoAvailabilityClient'
 import { DemoLaunchAction } from '@/components/ui/DemoLaunchAction'
 import { PageHeader } from '@/components/ui/PageHeader'
 import {
@@ -70,6 +71,12 @@ export default async function DemoPage({ params }: DemoPageProps) {
         <span className="text-xs font-normal uppercase tracking-[0.06em] text-[var(--secondary-accent)]">
           {demo.status}
         </span>
+        {demo.availability ? (
+          <DemoAvailabilityClient
+            availabilityKey={demo.availability.key}
+            mode="context"
+          />
+        ) : null}
         <ul className="flex flex-wrap gap-2">
           {demo.tags.map((tag) => (
             <li

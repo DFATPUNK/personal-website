@@ -40,6 +40,13 @@ export async function generateMetadata({
   return {
     title: essay.metadata.title,
     description: essay.metadata.description,
+    robots:
+      essay.metadata.status === 'in-progress'
+        ? {
+            index: false,
+            follow: true,
+          }
+        : undefined,
     alternates: {
       canonical: absoluteUrl(`/essays/${essay.slug}`),
     },
@@ -47,7 +54,7 @@ export async function generateMetadata({
     openGraph: {
       title: essay.metadata.title,
       description: essay.metadata.description,
-      type: 'article',
+      type: essay.metadata.status === 'in-progress' ? 'website' : 'article',
       url: absoluteUrl(`/essays/${essay.slug}`),
       publishedTime: essay.metadata.publishedAt,
       modifiedTime: essay.metadata.updatedAt,

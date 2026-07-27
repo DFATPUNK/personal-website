@@ -10,13 +10,52 @@ PR 4 uses internal landing pages on the personal website. It does not reverse-pr
 
 | Display name | Personal website route | External demos route | Source repository | Documentation |
 | --- | --- | --- | --- | --- |
+| MLP — Machine Learning Pipeline Builder | `/demos/mlp` | `https://mlp.jeremybrunet.com/` | `https://github.com/DFATPUNK/mlp` | None |
+| Parameter Golf Calculator | `/demos/pg-calculator` | `https://demos.jeremybrunet.com/pg-calculator` | `https://github.com/DFATPUNK/pg-calculator` | `https://writebook.jeremybrunet.com/5/pg-calculator` |
 | Zero-Touch Onboarding / Alan | `/demos/alan` | `https://demos.jeremybrunet.com/alan` | `https://github.com/DFATPUNK/hr-onboarding-engine` | `https://writebook.jeremybrunet.com/3/alan.com` |
 | Balatro Joker Generator | `/demos/balatro` | `https://demos.jeremybrunet.com/balatro` | `https://github.com/DFATPUNK/balatro-card-generator` | None verified during PR 4 |
-| Parameter Golf Calculator | `/demos/pg-calculator` | `https://demos.jeremybrunet.com/pg-calculator` | `https://github.com/DFATPUNK/pg-calculator` | `https://writebook.jeremybrunet.com/5/pg-calculator` |
-| MLP — Machine Learning Pipeline Builder | `/demos/mlp` | `https://mlp.jeremybrunet.com/` | `https://github.com/DFATPUNK/mlp` | None |
 
 The original demos-hub routes returned HTTP 200 during the PR 4 audit on July
 21, 2026. MLP was added later as a standalone-hosted live demo.
+
+## Availability
+
+Only Alan and MLP expose live Supabase availability in this version. Their
+public registry entries expose a safe logical key only:
+
+```ts
+availability: {
+  provider: 'supabase',
+  key: 'alan',
+}
+```
+
+Parameter Golf and Balatro do not show database availability indicators.
+
+The browser calls only personal-site API routes:
+
+```txt
+GET /api/demos/availability
+POST /api/demos/availability/{key}/wake
+```
+
+The server calls n8n with server-only values:
+
+```txt
+DEMO_STATUS_WEBHOOK_URL
+DEMO_WAKE_WEBHOOK_URL
+DEMO_WEBHOOK_SIGNING_SECRET
+```
+
+Status responses use the normalized states `active`, `waking`, `inactive`, and
+`unavailable`, plus `checkedAt` and the logical key. Raw Supabase responses,
+project refs, access tokens, anon keys, n8n URLs, and signing secrets are never
+sent to the browser.
+
+The status route shares successful status data for about 15 seconds. Wake
+requests are never cached. When the integration variables are absent or n8n
+cannot be reached, Alan and MLP safely render `Unavailable`; launch and source
+links remain usable.
 
 ## Observed Route Discrepancy
 

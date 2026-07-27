@@ -8,8 +8,21 @@ import { topicSlugSchema, type TopicSlug } from '@/lib/topics/registry'
 
 const essaysDirectory = path.join(process.cwd(), 'content/essays')
 
-export const essayStatusSchema = z.enum(['draft', 'published', 'external'])
+export const essayStatusSchema = z.enum([
+  'draft',
+  'published',
+  'external',
+  'in-progress',
+])
 export const essayLayoutSchema = z.enum(['standard', 'immersive'])
+export const interestSourceSchema = z
+  .string()
+  .min(1)
+  .max(80)
+  .regex(
+    /^[a-z0-9]+(?::[a-z0-9]+(?:-[a-z0-9]+)*)+$/,
+    'Use a safe interest source such as essay:event-driven-database.',
+  )
 
 export const essayDateSchema = z
   .string()
@@ -38,6 +51,7 @@ export const essayMetadataSchema = z
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Use a URL-safe slug.'),
     description: z.string().min(1),
     publishedAt: essayDateSchema.optional(),
+    announcedAt: essayDateSchema.optional(),
     updatedAt: essayDateSchema.optional(),
     status: essayStatusSchema,
     layout: essayLayoutSchema,
@@ -45,6 +59,7 @@ export const essayMetadataSchema = z
     featured: z.boolean().optional(),
     externalUrl: urlSchema.optional(),
     repositoryUrl: urlSchema.optional(),
+    interestSource: interestSourceSchema.optional(),
   })
   .strict()
   .superRefine((metadata, context) => {
@@ -53,6 +68,14 @@ export const essayMetadataSchema = z
         code: z.ZodIssueCode.custom,
         path: ['publishedAt'],
         message: 'Published essays require publishedAt.',
+      })
+    }
+
+    if (metadata.status === 'in-progress' && !metadata.announcedAt) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['announcedAt'],
+        message: 'In-progress essays require announcedAt.',
       })
     }
 
@@ -146,9 +169,15 @@ function readEssay(directory: string, fileName: string): Essay {
   }
 }
 
+export function getEssaySortDate(essay: Essay) {
+  return essay.metadata.status === 'in-progress'
+    ? (essay.metadata.announcedAt ?? '')
+    : (essay.metadata.publishedAt ?? '')
+}
+
 function compareEssaysByDate(first: Essay, second: Essay) {
-  const firstDate = first.metadata.publishedAt ?? ''
-  const secondDate = second.metadata.publishedAt ?? ''
+  const firstDate = getEssaySortDate(first)
+  const secondDate = getEssaySortDate(second)
   const dateOrder = secondDate.localeCompare(firstDate)
 
   if (dateOrder !== 0) {
@@ -202,7 +231,7 @@ export function getAllEssays(options?: EssayValidationOptions) {
 
 export function getPublicEssayEntries(options?: EssayValidationOptions) {
   return getAllEssays(options).filter((essay) =>
-    ['published', 'external'].includes(essay.metadata.status),
+    ['published', 'external', 'in-progress'].includes(essay.metadata.status),
   )
 }
 
@@ -212,8 +241,14 @@ export function getPublishedEssays(options?: EssayValidationOptions) {
   )
 }
 
+export function getRoutableEssays(options?: EssayValidationOptions) {
+  return getAllEssays(options).filter((essay) =>
+    ['published', 'in-progress'].includes(essay.metadata.status),
+  )
+}
+
 export function getEssaySlugs(options?: EssayValidationOptions) {
-  return getPublishedEssays(options).map((essay) => essay.slug)
+  return getRoutableEssays(options).map((essay) => essay.slug)
 }
 
 export function getEssayStaticParams(options?: EssayValidationOptions) {
@@ -221,7 +256,7 @@ export function getEssayStaticParams(options?: EssayValidationOptions) {
 }
 
 export function getEssayBySlug(slug: string, options?: EssayValidationOptions) {
-  return getPublishedEssays(options).find((essay) => essay.slug === slug)
+  return getRoutableEssays(options).find((essay) => essay.slug === slug)
 }
 
 export function formatEssayDate(value: string) {
