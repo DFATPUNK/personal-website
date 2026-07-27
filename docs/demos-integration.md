@@ -69,6 +69,10 @@ The release deliberately does not:
 - add cross-project Vercel rewrites;
 - change DNS or subdomains.
 
+The demos index describes demos and contexts publicly. It notes that some demos
+may need a short warm-up without claiming every demo uses an on-demand database
+or exposing a fake dynamic availability indicator.
+
 ## Adding A Future Demo
 
 Future public demos should be added by editing the typed registry in `lib/content/demos.ts`.

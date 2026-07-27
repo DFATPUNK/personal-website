@@ -13,7 +13,8 @@ import { getTopicLabel } from '@/lib/topics/registry'
 
 export const metadata: Metadata = {
   title: 'Demos',
-  description: 'A concise catalog of live technical demos by Jérémy Brunet.',
+  description:
+    'Live demos and technical context by Jérémy Brunet, including applications that may need a short warm-up.',
   alternates: {
     canonical: absoluteUrl('/demos'),
   },
@@ -26,8 +27,8 @@ export default function DemosPage() {
     <>
       <PageHeader
         eyebrow="Demos"
-        title="A concise catalog of live technical demos."
-        description="Short landing pages live here; the applications remain on their dedicated demos host."
+        title="Demos and contexts."
+        description="Please note that some demos rely on on-demand databases and may need a short warm-up."
       />
 
       {demos.length > 0 ? (

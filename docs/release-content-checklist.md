@@ -22,11 +22,15 @@ This checklist tracks human-supplied content required before `v2` is merged to
   external historical writing references.
 - Removal or continued non-publication of the temporary `foundation-sample`
   essay.
-- Topic aggregation/filtering.
-- External demo visual harmonization if desired.
-- CS229 immersive demo.
-- Production `v2 -> main` release review.
 - Vercel `CONTACT_WEBHOOK_URL` production configuration if still unset.
+- Final review of the `v2 -> main` release PR.
+- Any unresolved defects found during final QA.
+
+## Deferred after V2 launch
+
+- Topic aggregation/filtering.
+- External demo visual harmonization.
+- CS229 immersive demo.
 
 ## Current content boundary
 

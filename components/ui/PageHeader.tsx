@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react'
+
 type PageHeaderProps = {
   eyebrow?: string
-  title: string
-  description?: string
+  title: ReactNode
+  description?: ReactNode
 }
 
 export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
@@ -12,7 +14,7 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
           {eyebrow}
         </p>
       ) : null}
-      <h1 className="max-w-md text-2xl font-semibold leading-tight">
+      <h1 className="max-w-md break-words text-2xl font-semibold leading-tight">
         {title}
       </h1>
       {description ? (

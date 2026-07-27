@@ -14,7 +14,7 @@ const topicLabels = new Map(topics.map((topic) => [topic.slug, topic.label]))
 export const metadata: Metadata = {
   title: 'Technical Portfolio',
   description:
-    'Jérémy Brunet builds API integrations, automation workflows, data architectures, and applied AI systems for complex work.',
+    'Jérémy Brunet designs intelligent automations across SaaS, event-driven data architecture, applied AI, MCP, and machine-learning pipelines.',
   alternates: {
     canonical: absoluteUrl('/'),
   },

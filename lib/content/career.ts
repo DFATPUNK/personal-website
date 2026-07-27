@@ -30,7 +30,7 @@ export const careerEntries: readonly CareerEntry[] = [
     startDate: '2018',
     endDate: '2025',
     summary:
-      'I spent seven years building data architectures, API integrations, and automated workflows. As Data & Automation Lead at the no-code and low-code agency Automate Me, I designed and delivered more than 1,000 automations across Zapier, n8n, Make, and Parabola, as well as over 100 databases using Airtable, Supabase, and Firebase. I helped more than 50 companies complete tasks representing a total of more than 20,000 hours of manual work.',
+      'Over seven years building data architectures, API integrations, and automated workflows. As Data & Automation Lead at the no-code and low-code agency Automate Me, I designed and delivered more than 1,000 automations across Zapier, n8n, Make, and Parabola, as well as over 100 databases using Airtable, Supabase, and Firebase. I helped more than 50 companies eliminate over 20,000 hours of manual work.',
     tags: [
       'automations',
       'apis',
@@ -47,7 +47,7 @@ export const careerEntries: readonly CareerEntry[] = [
     startDate: '2016',
     endDate: '2018',
     summary:
-      'I spent more than two years building a peer-to-peer educational chatbot that helped K–12 students work on their homework together after school. It was my first entrepreneurial venture and a practical introduction to APIs, algorithms, data analysis, and workflow automation. I worked across product, data, community, and technical support.',
+      'Over two years building a peer-to-peer educational chatbot that helped K–12 students work on their homework together after school. My first entrepreneurial venture and a practical introduction to APIs, algorithms, data analysis, and workflow automation. Worked across product, data, community, and technical support.',
     tags: ['apis', 'data', 'automations'],
   },
 ]

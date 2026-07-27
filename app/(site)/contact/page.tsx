@@ -7,7 +7,8 @@ import { absoluteUrl } from '@/lib/seo/urls'
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: 'Contact Jérémy Brunet about work, roles, essays, or code.',
+  description:
+    'Email Jérémy Brunet or use the contact form for work, roles, essays, or code.',
   alternates: {
     canonical: absoluteUrl('/contact'),
   },
@@ -18,8 +19,15 @@ export default function ContactPage() {
     <>
       <PageHeader
         eyebrow="Contact"
-        title="Send a focused note."
-        description="Choose the closest topic and write the context I need to understand the message. The form validates on the server before delivery."
+        title={
+          <a
+            className="border-b border-[var(--border)] text-[var(--accent)]"
+            href="mailto:jeremy@jeremybrunet.com"
+          >
+            jeremy@jeremybrunet.com
+          </a>
+        }
+        description="Or use the form below at your convenience."
       />
       <SectionRow title="Message">
         <ContactForm />

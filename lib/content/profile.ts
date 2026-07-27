@@ -30,10 +30,11 @@ export type ProfileContent = {
 
 export const profileIntroduction = {
   eyebrow: 'About',
-  title: 'AI Systems & Automation Specialist',
-  summary: 'My goal is to build the best systems possible for complex, high-value work.',
+  title: 'AI & Automation Specialist',
+  summary:
+    'Building intelligent automations to complete complex, high-value tasks.',
   body: [
-    'I combine APIs, automation, and data architecture with applied AI across marketing, sales, and human resources. For execution and knowledge flow, I build integrations, workflows, and automated documentation; for data processing and decision-making, I design databases, algorithms, and machine-learning pipelines.',
+    'I design end-to-end workflows across marketing, sales, and HR, combining SaaS, event-driven data architecture, and applied AI. I automate key workflows, use MCP to connect AI agents to external tools, and deliver shared databases, documentation, and machine-learning pipelines.',
   ],
 } as const satisfies ProfileIntroduction
 

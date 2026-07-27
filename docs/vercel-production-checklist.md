@@ -29,7 +29,15 @@ This is the manual checklist for the later release pull request from `v2` to
 - Real recent local essay, or explicit launch decision with external references
 - Demo wording and MLP entry
 - Link ownership, including LinkedIn and demo/repository links
+- Keeping `foundation-sample` non-public
+- Any unresolved defects found during final QA
 - Legal/privacy wording if later desired
+
+## Deferred after V2 launch
+
+- Topic aggregation/filtering.
+- External demo visual harmonization.
+- CS229 immersive demo.
 
 ## Human Vercel checks
 

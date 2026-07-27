@@ -6,6 +6,20 @@ import { describe, expect, it } from 'vitest'
 import { CONTACT_TOPICS } from '../lib/contact/config'
 
 describe('contact public copy', () => {
+  it('uses an email-first contact introduction with a mailto title link', () => {
+    const source = fs.readFileSync(
+      path.join(process.cwd(), 'app/(site)/contact/page.tsx'),
+      'utf8',
+    )
+
+    expect(source).toContain('eyebrow="Contact"')
+    expect(source).toContain('href="mailto:jeremy@jeremybrunet.com"')
+    expect(source).toContain('jeremy@jeremybrunet.com')
+    expect(source).toContain('Or use the form below at your convenience.')
+    expect(source).not.toContain('Send a focused note.')
+    expect(source).not.toContain('server before delivery')
+  })
+
   it('keeps the internal payload field named topic while exposing subject copy', () => {
     const source = fs.readFileSync(
       path.join(process.cwd(), 'components/contact/ContactForm.tsx'),

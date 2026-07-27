@@ -105,6 +105,8 @@ Do not send personal test messages to a real webhook. Use tests with mocked `fet
 
 ## Current content-copy notes
 
+- The contact page introduces direct email first with
+  `jeremy@jeremybrunet.com`, then offers the form as a convenience.
 - `Need your help` asks `Where are you stuck?` and includes a collapsed native
   `<details>` example for a realistic HR workflow.
 - `Job offer` asks for role and team context, and the optional date label is
