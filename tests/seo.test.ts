@@ -37,6 +37,16 @@ describe('seo foundation', () => {
     expect(urls).not.toContain(
       'https://jeremybrunet.com/essays/foundation-sample',
     )
+    expect(urls).toContain('https://jeremybrunet.com/demos/mlp')
+    expect(urls).not.toContain(
+      'https://jeremybrunet.com/essays/how-to-hack-people-loyalty-with-care',
+    )
+    expect(urls).not.toContain(
+      'https://jeremybrunet.com/essays/how-to-scrap-didier-deschamps-email',
+    )
+    expect(urls).not.toContain(
+      'https://jeremybrunet.com/essays/and-the-award-for-the-best-mooc-goes-to',
+    )
     expect(urls.some((url) => url.includes('/api/'))).toBe(false)
     expect(urls.some((url) => url.includes('example.com'))).toBe(false)
   })

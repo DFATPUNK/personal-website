@@ -1,0 +1,49 @@
+import Link from 'next/link'
+import { Github, Linkedin, Mail } from 'lucide-react'
+
+import { siteConfig } from '@/lib/site-config'
+
+export function SiteFooter() {
+  return (
+    <footer className="mt-16 border-t border-[var(--border)] pt-6 text-sm text-[var(--muted-foreground)]">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p>© Jérémy Brunet</p>
+        <nav aria-label="Footer navigation">
+          <ul className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <li>
+              <Link
+                className="inline-flex items-center gap-1.5 hover:text-[var(--accent)]"
+                href="/contact"
+              >
+                Contact
+                <Mail aria-hidden size={18} strokeWidth={1.8} />
+              </Link>
+            </li>
+            <li>
+              <a
+                aria-label="GitHub profile"
+                className="inline-flex hover:text-[var(--accent)]"
+                href={siteConfig.links.github}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Github aria-hidden size={18} strokeWidth={1.8} />
+              </a>
+            </li>
+            <li>
+              <a
+                aria-label="LinkedIn profile"
+                className="inline-flex hover:text-[var(--accent)]"
+                href={siteConfig.links.linkedin}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <Linkedin aria-hidden size={18} strokeWidth={1.8} />
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </footer>
+  )
+}

@@ -2,7 +2,12 @@ import {
   academicEntries,
   type AcademicEntry,
 } from '@/lib/content/academics'
-import { careerEntries, type CareerEntry } from '@/lib/content/career'
+import {
+  careerEntries,
+  previousRoles,
+  type CareerEntry,
+  type PreviousRole,
+} from '@/lib/content/career'
 import {
   testimonials,
   type Testimonial,
@@ -18,24 +23,25 @@ export type ProfileIntroduction = {
 export type ProfileContent = {
   introduction: ProfileIntroduction
   career: readonly CareerEntry[]
+  previousRoles: readonly PreviousRole[]
   academics: readonly AcademicEntry[]
   testimonials: readonly Testimonial[]
 }
 
 export const profileIntroduction = {
-  eyebrow: 'Who I am?',
-  title: 'Who I am?',
+  eyebrow: 'About',
+  title: 'AI & Automation Specialist',
   summary:
-    'Temporary profile introduction. Final personal copy has not been supplied yet.',
+    'Building intelligent automations to complete complex, high-value tasks.',
   body: [
-    'Placeholder introduction: this area is reserved for the final personal overview once approved copy is available.',
-    'The page structure is ready for a concise profile, selected career entries, academic history, and verified testimonials without treating draft text as public fact.',
+    'I design end-to-end workflows across marketing, sales, and HR, combining SaaS, event-driven data architecture, and applied AI. I automate key workflows, use MCP to connect AI agents to external tools, and deliver shared databases, documentation, and machine-learning pipelines.',
   ],
 } as const satisfies ProfileIntroduction
 
 export const profileContent = {
   introduction: profileIntroduction,
   career: careerEntries,
+  previousRoles,
   academics: academicEntries,
   testimonials,
 } as const satisfies ProfileContent

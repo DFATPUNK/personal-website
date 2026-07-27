@@ -43,12 +43,54 @@ describe('essay content foundation', () => {
     expect(essay?.metadata.status).toBe('draft')
   })
 
-  it('keeps the temporary sample essay out of public surfaces', () => {
-    expect(getAllEssays()).toHaveLength(1)
+  it('keeps the temporary sample essay out of public local surfaces', () => {
+    expect(getAllEssays()).toHaveLength(4)
     expect(getPublishedEssays()).toHaveLength(0)
-    expect(getPublicEssayEntries()).toHaveLength(0)
+    expect(getPublicEssayEntries()).toHaveLength(3)
     expect(getEssayBySlug('foundation-sample')).toBeUndefined()
     expect(getEssayStaticParams()).toEqual([])
+  })
+
+  it('publishes the expected external Medium references', () => {
+    const externalEntries = getPublicEssayEntries().filter(
+      (essay) => essay.metadata.status === 'external',
+    )
+
+    expect(externalEntries.map((essay) => essay.slug)).toEqual([
+      'and-the-award-for-the-best-mooc-goes-to',
+      'how-to-scrap-didier-deschamps-email',
+      'how-to-hack-people-loyalty-with-care',
+    ])
+    expect(externalEntries.map((essay) => essay.metadata.title)).toEqual([
+      'And the award for the best MOOC goes to…🥁',
+      'How to scrap Didier Deschamps email',
+      'How to hack people loyalty with care?',
+    ])
+    expect(externalEntries.map((essay) => essay.metadata.publishedAt)).toEqual([
+      '2018-08-30',
+      '2018-07-13',
+      '2018-07-11',
+    ])
+    expect(externalEntries.map((essay) => essay.metadata.externalUrl)).toEqual([
+      'https://medium.com/free-code-camp/and-the-award-for-the-best-mooc-goes-to-308604e5bf2a',
+      'https://medium.com/hackernoon/how-to-scrap-didier-deschamps-email-651891ebe1e4',
+      'https://medium.com/user-experience-design-1/how-to-hack-people-loyalty-with-care-f2ce9346c47c',
+    ])
+  })
+
+  it('validates external Medium topic slugs', () => {
+    const externalTags = getPublicEssayEntries()
+      .filter((essay) => essay.metadata.status === 'external')
+      .flatMap((essay) => essay.metadata.tags)
+
+    expect(externalTags).toEqual([
+      'education',
+      'cs50',
+      'user-experience',
+      'web-scraping',
+      'data',
+      'user-experience',
+    ])
   })
 
   it('leaves unknown essay slugs private', () => {

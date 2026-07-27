@@ -13,8 +13,10 @@ PR 4 uses internal landing pages on the personal website. It does not reverse-pr
 | Zero-Touch Onboarding / Alan | `/demos/alan` | `https://demos.jeremybrunet.com/alan` | `https://github.com/DFATPUNK/hr-onboarding-engine` | `https://writebook.jeremybrunet.com/3/alan.com` |
 | Balatro Joker Generator | `/demos/balatro` | `https://demos.jeremybrunet.com/balatro` | `https://github.com/DFATPUNK/balatro-card-generator` | None verified during PR 4 |
 | Parameter Golf Calculator | `/demos/pg-calculator` | `https://demos.jeremybrunet.com/pg-calculator` | `https://github.com/DFATPUNK/pg-calculator` | `https://writebook.jeremybrunet.com/5/pg-calculator` |
+| MLP — Machine Learning Pipeline Builder | `/demos/mlp` | `https://mlp.jeremybrunet.com/` | `https://github.com/DFATPUNK/mlp` | None |
 
-The live routes above returned HTTP 200 during the PR 4 audit on July 21, 2026.
+The original demos-hub routes returned HTTP 200 during the PR 4 audit on July
+21, 2026. MLP was added later as a standalone-hosted live demo.
 
 ## Observed Route Discrepancy
 
@@ -67,6 +69,10 @@ The release deliberately does not:
 - add cross-project Vercel rewrites;
 - change DNS or subdomains.
 
+The demos index describes demos and contexts publicly. It notes that some demos
+may need a short warm-up without claiming every demo uses an on-demand database
+or exposing a fake dynamic availability indicator.
+
 ## Adding A Future Demo
 
 Future public demos should be added by editing the typed registry in `lib/content/demos.ts`.
@@ -75,13 +81,21 @@ Before adding a live entry:
 
 1. Verify the public external route.
 2. Choose one URL-safe canonical slug.
-3. Store the external path, such as `/mlp`, rather than repeating the demos host.
+3. Use exactly one destination field:
+   - `externalPath` for applications on `https://demos.jeremybrunet.com`;
+   - `externalUrl` for applications on another validated HTTP/HTTPS host.
 4. Add verified repository and documentation URLs only when available.
 5. Use only registered topic tags.
 6. Add or update focused registry tests when the route set changes.
 
 Adding a future `/demos/mlp` page should require a registry entry, not a layout rewrite.
 
-## Deferred MLP Entry
+Live links continue to use `DemoLaunchAction`, which hides the launch link below
+the `lg` breakpoint and keeps source repository links available on mobile.
 
-MLP is intentionally not published in PR 4. Add it later after its stable public destination and final display wording are confirmed.
+## MLP Entry
+
+MLP is published as `/demos/mlp` with `externalUrl:
+https://mlp.jeremybrunet.com/` because it is not hosted on the demos hub.
+The personal website does not iframe, proxy, migrate, or modify the external
+MLP application.

@@ -13,7 +13,7 @@ import { getTopicLabel } from '@/lib/topics/registry'
 export const metadata: Metadata = {
   title: 'Essays',
   description:
-    'A chronological index for published local essays and verified external writing references.',
+    'Essays, notebooks, tutorials, and external publications by Jérémy Brunet.',
   alternates: {
     canonical: absoluteUrl('/essays'),
   },
@@ -28,8 +28,8 @@ export default function EssaysPage() {
     <>
       <PageHeader
         eyebrow="Essays"
-        title="Technical essays, notes, and references."
-        description="A chronological index of local writing and occasional external publications."
+        title="Essays, notebooks, and tutorials."
+        description="My writing, from newest to oldest, including past external publications."
       />
       {essays.length > 0 ? (
         <div className="space-y-8">
@@ -57,7 +57,11 @@ export default function EssaysPage() {
                 </div>
                 <h2 className="text-xl font-semibold leading-tight sm:text-2xl">
                   {isExternal ? (
-                    <a href={externalHref} rel="noreferrer" target="_blank">
+                    <a
+                      href={externalHref}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
                       {essay.metadata.title}
                     </a>
                   ) : (

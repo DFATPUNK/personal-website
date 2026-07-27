@@ -14,11 +14,10 @@ export const CONTACT_TOPICS = [
   {
     value: 'need-help',
     label: 'Need your help',
-    messageLabel: "Describe your typical day job and where you're stuck.",
+    messageLabel: 'Where are you stuck?',
     helperText:
-      'You can mention what you do, the current process, where you are blocked, and which tools you use.',
-    placeholder:
-      'I work with Airtable and n8n every day. The process currently looks like...',
+      'Describe what you do, the current process, where you are blocked, and which tools and services you use.',
+    placeholder: "I'm an HR manager at Acme Inc. My day starts with...",
     rows: 7,
   },
   {
@@ -27,7 +26,7 @@ export const CONTACT_TOPICS = [
     messageLabel:
       'Describe the open position and why you think I may fit in.',
     helperText:
-      'Share the role, the team context, and why this profile seems relevant.',
+      'Describe the role, the team context, and what you expect from the person in this position.',
     placeholder:
       'We are hiring for a role focused on automation and internal tools...',
     rows: 7,

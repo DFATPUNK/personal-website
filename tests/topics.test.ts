@@ -15,7 +15,19 @@ describe('topic registry', () => {
   })
 
   it('recognizes registered topic slugs', () => {
-    expect(isTopicSlug('ai')).toBe(true)
+    for (const slug of [
+      'ai',
+      'llm',
+      'figma',
+      'database',
+      'hr',
+      'user-experience',
+      'web-scraping',
+      'education',
+      'cs50',
+    ]) {
+      expect(isTopicSlug(slug)).toBe(true)
+    }
     expect(isTopicSlug('unknown-topic')).toBe(false)
   })
 

@@ -299,7 +299,7 @@ The primary navigation should be minimal and stable.
 Top-level navigation items:
 
 ```txt
-Who I am?
+About
 Essays
 Demos
 Contact
@@ -346,7 +346,7 @@ The site must feel like a serious technical notebook and portfolio, not like a g
 
 ---
 
-## 10. Page specification — Home / “Who I am?”
+## 10. Page specification — Home / About
 
 ### 10.1 Route
 
@@ -359,7 +359,7 @@ The site must feel like a serious technical notebook and portfolio, not like a g
 The home page replaces the MatX “Company” page concept with a personal equivalent:
 
 ```txt
-Who I am?
+About
 ```
 
 The page must introduce Jérémy’s profile and provide an editorial overview of:
@@ -960,18 +960,17 @@ But this must be done only after analyzing:
 - Vercel rewrites;
 - potential rewrite loops.
 
-### 14.7 Future MLP demo
+### 14.7 MLP demo
 
-The demo registry must be ready for a future MLP demo when the MVP is ready.
+The demo registry supports MLP as a standalone-hosted public demo.
 
-The MLP demo should eventually be represented as a high-priority demo tagged with:
+The MLP demo is represented with:
 
 - Machine Learning;
 - AI;
 - Data;
 - React;
-- APIs;
-- possibly Event-driven Architecture if relevant.
+- APIs.
 
 ### 14.8 Acceptance criteria
 
@@ -1726,7 +1725,7 @@ A dedicated document should explain:
 - why demos stay separate initially;
 - future URL unification options;
 - risks with rewrites and asset paths;
-- how to add MLP later.
+- how MLP is registered as a standalone-hosted demo.
 
 ### 23.4 Acceptance criteria
 
@@ -1801,7 +1800,7 @@ Recommended phased delivery:
 
 ### Phase 2 — Home page
 
-- Implement Who I am?
+- Implement About.
 - Add Career.
 - Add Academics.
 - Add Testimonials structure.
@@ -1977,7 +1976,7 @@ Future features may include:
 - interactive event-driven database essay;
 - Airtable-backed public examples;
 - n8n workflow gallery;
-- MLP demo integration;
+- external demo visual harmonization;
 - downloadable CV;
 - richer project case studies;
 - newsletter or RSS feed;

@@ -7,11 +7,19 @@ export const topicSlugs = [
   'airtable',
   'python',
   'machine-learning',
+  'llm',
   'n8n',
   'apis',
   'data',
+  'database',
   'event-driven-architecture',
   'react',
+  'figma',
+  'hr',
+  'user-experience',
+  'web-scraping',
+  'education',
+  'cs50',
 ] as const
 
 export type TopicSlug = (typeof topicSlugs)[number]
@@ -23,11 +31,19 @@ const topicLabels = {
   airtable: 'Airtable',
   python: 'Python',
   'machine-learning': 'Machine Learning',
+  llm: 'LLM',
   n8n: 'n8n',
   apis: 'APIs',
   data: 'Data',
+  database: 'Database',
   'event-driven-architecture': 'Event-driven Architecture',
   react: 'React',
+  figma: 'Figma',
+  hr: 'HR',
+  'user-experience': 'User Experience',
+  'web-scraping': 'Web Scraping',
+  education: 'Education',
+  cs50: 'CS50',
 } satisfies Record<TopicSlug, string>
 
 export const topics = topicSlugs.map((slug) => ({

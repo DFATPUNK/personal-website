@@ -21,14 +21,23 @@ This is the manual checklist for the later release pull request from `v2` to
 
 ## Human content checks
 
-- Final profile copy
-- Career entries
-- Academics
+- Final About/profile copy
+- Career entries and previous roles
+- Academics and local certificate assets
 - Testimonials
-- Real essays, or explicit empty Essays launch decision
-- Demo wording
-- Link ownership
+- External historical Medium references
+- Real recent local essay, or explicit launch decision with external references
+- Demo wording and MLP entry
+- Link ownership, including LinkedIn and demo/repository links
+- Keeping `foundation-sample` non-public
+- Any unresolved defects found during final QA
 - Legal/privacy wording if later desired
+
+## Deferred after V2 launch
+
+- Topic aggregation/filtering.
+- External demo visual harmonization.
+- CS229 immersive demo.
 
 ## Human Vercel checks
 

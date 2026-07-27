@@ -179,7 +179,7 @@ export function ContactForm() {
 
       <div>
         <label className="block text-sm font-semibold" htmlFor="contact-topic">
-          Reason for contact <span aria-hidden="true">*</span>
+          Subject <span aria-hidden="true">*</span>
         </label>
         <select
           ref={topicRef}
@@ -197,7 +197,7 @@ export function ContactForm() {
           required
           value={form.topic}
         >
-          <option value="">Select a reason</option>
+          <option value="">Select a subject</option>
           {CONTACT_TOPICS.map((topic) => (
             <option key={topic.value} value={topic.value}>
               {topic.label}
@@ -221,6 +221,23 @@ export function ContactForm() {
           >
             {selectedTopic.helperText}
           </p>
+          {form.topic === 'need-help' ? (
+            <details className="mt-3 border-l-2 border-[var(--border)] pl-3 text-sm leading-6 text-[var(--muted-foreground)]">
+              <summary className="cursor-pointer text-[var(--foreground)] focus-visible:outline-offset-4">
+                See a realistic example
+              </summary>
+              <p className="mt-2">
+                I&apos;m an HR manager at Acme Inc. I work from Monday to
+                Friday, from 9 AM to 5 PM. The first thing I do every morning
+                is read my emails and important notes I&apos;ve handwritten on
+                Post-its. Deadlines are tight: I need to review many résumés,
+                check in with employees, report to the CEO, and search for
+                important data across multiple spreadsheets. I struggle to
+                write clear memos and feel overwhelmed by noisy
+                notifications...
+              </p>
+            </details>
+          ) : null}
           <textarea
             ref={messageRef}
             aria-describedby={describeBy(
@@ -253,7 +270,7 @@ export function ContactForm() {
             className="block text-sm font-semibold"
             htmlFor="contact-preferred-date"
           >
-            When would you like to book a first interview?
+            When would you like to meet?
           </label>
           <p
             className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]"

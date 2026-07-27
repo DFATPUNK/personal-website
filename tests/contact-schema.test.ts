@@ -36,7 +36,7 @@ describe('contact form schema', () => {
     }
   })
 
-  it('rejects an empty topic with public reason copy', () => {
+  it('rejects an empty topic with public subject copy', () => {
     const result = validateContactFormInput(
       {
         ...validInput('other'),
@@ -47,11 +47,11 @@ describe('contact form schema', () => {
 
     expect(result.ok).toBe(false)
     expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
-      'Please select a reason for contact.',
+      'Please select a subject.',
     )
   })
 
-  it('rejects a missing topic with public reason copy', () => {
+  it('rejects a missing topic with public subject copy', () => {
     const result = validateContactFormInput(
       {
         email: 'reviewer@acme.co',
@@ -62,11 +62,11 @@ describe('contact form schema', () => {
 
     expect(result.ok).toBe(false)
     expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
-      'Please select a reason for contact.',
+      'Please select a subject.',
     )
   })
 
-  it('rejects a non-string topic with public reason copy', () => {
+  it('rejects a non-string topic with public subject copy', () => {
     const result = validateContactFormInput(
       {
         ...validInput('other'),
@@ -77,7 +77,7 @@ describe('contact form schema', () => {
 
     expect(result.ok).toBe(false)
     expect(result.ok ? undefined : result.fieldErrors.topic).toBe(
-      'Please select a valid reason for contact.',
+      'Please select a valid subject.',
     )
   })
 
@@ -93,7 +93,7 @@ describe('contact form schema', () => {
     expect(result.ok).toBe(false)
     const error = result.ok ? undefined : result.fieldErrors.topic
 
-    expect(error).toBe('Please select a valid reason for contact.')
+    expect(error).toBe('Please select a valid subject.')
     expect(error).not.toContain('Invalid enum')
     expect(error).not.toContain('need-help')
   })

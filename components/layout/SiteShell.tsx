@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteNavigation } from '@/components/navigation/SiteNavigation'
 
 export function SiteShell({ children }: { children: ReactNode }) {
@@ -14,7 +15,10 @@ export function SiteShell({ children }: { children: ReactNode }) {
         id="main-content"
         tabIndex={-1}
       >
-        <div className="w-full max-w-[var(--content-width)]">{children}</div>
+        <div className="w-full max-w-[var(--content-width)]">
+          {children}
+          <SiteFooter />
+        </div>
       </main>
     </div>
   )
