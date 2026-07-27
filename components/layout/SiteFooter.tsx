@@ -15,7 +15,6 @@ export function SiteFooter() {
                 className="inline-flex items-center gap-1.5 hover:text-[var(--foreground)]"
                 href="/contact"
               >
-                Contact
                 <Mail aria-hidden size={16} strokeWidth={1.8} />
               </Link>
             </li>
