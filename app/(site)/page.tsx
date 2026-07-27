@@ -150,7 +150,7 @@ function TopicList({ tags }: { tags: readonly TopicSlug[] | undefined }) {
   }
 
   return (
-    <ul className="flex flex-wrap gap-2 text-xs text-[var(--muted-foreground)]">
+    <ul className="flex flex-wrap gap-2 text-xs text-[#666666]">
       {tags.map((tag) => (
         <li key={tag} className="border border-[var(--border)] px-2 py-1">
           {topicLabels.get(tag) ?? tag}
@@ -170,11 +170,11 @@ function LinkList({
   }
 
   return (
-    <ul className="space-y-1 text-sm">
+    <ul className="space-y-1 text-sm text-[var(--foreground)]">
       {links.map((link) => (
         <li key={link.href}>
           <a
-            className="border-b border-[var(--border)]"
+            className="border-b border-[var(--muted-foreground)] hover:border-[var(--foreground)]"
             href={link.href}
             rel={isExternalUrl(link.href) ? 'noopener noreferrer' : undefined}
             target={isExternalUrl(link.href) ? '_blank' : undefined}

@@ -28,13 +28,13 @@ export function StandardEssay({ essay }: { essay: Essay }) {
   return (
     <article>
       <header className="mb-10 border-b border-[var(--border)] pb-8">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.08em] text-[var(--secondary-accent)] sm:tracking-[0.16em]">
+        <p className="mb-4 text-xs font-normal uppercase tracking-[0.06em] text-[var(--muted-foreground)]">
           Essay
         </p>
-        <h1 className="max-w-md text-2xl font-semibold leading-tight">
+        <h1 className="max-w-[var(--content-width)] text-[1.625rem] font-normal leading-[1.2] sm:text-4xl sm:leading-[1.1]">
           {essay.metadata.title}
         </h1>
-        <p className="mt-5 max-w-md text-sm leading-6 text-[var(--muted-foreground)] sm:text-base sm:leading-7">
+        <p className="mt-5 max-w-[var(--content-width)] text-[15px] leading-[1.6] text-[var(--muted-foreground)] sm:text-lg">
           {essay.metadata.description}
         </p>
         <div className="mt-5 space-y-3 text-sm text-[var(--muted-foreground)]">
@@ -57,7 +57,12 @@ export function StandardEssay({ essay }: { essay: Essay }) {
           {essay.metadata.tags.length > 0 ? (
             <ul className="flex flex-wrap gap-2">
               {essay.metadata.tags.map((tag) => (
-                <li key={tag}>{getTopicLabel(tag)}</li>
+                <li
+                  className="border border-[var(--border)] px-2 py-1 text-xs text-[#666666]"
+                  key={tag}
+                >
+                  {getTopicLabel(tag)}
+                </li>
               ))}
             </ul>
           ) : null}

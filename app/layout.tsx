@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next'
+import { Geist, Geist_Mono } from 'next/font/google'
 import type { ReactNode } from 'react'
 import './globals.css'
 
@@ -7,6 +8,20 @@ import { serializeJsonLd } from '@/lib/seo/json-ld'
 import { absoluteUrl, getCanonicalOrigin } from '@/lib/seo/urls'
 
 const canonicalOrigin = getCanonicalOrigin()
+
+const sans = Geist({
+  display: 'swap',
+  subsets: ['latin'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600'],
+})
+
+const mono = Geist_Mono({
+  display: 'swap',
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['400', '500', '600'],
+})
 
 export const metadata: Metadata = {
   metadataBase: new URL(canonicalOrigin),
@@ -53,7 +68,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body>
+      <body className={`${sans.variable} ${mono.variable}`}>
         <script
           dangerouslySetInnerHTML={{
             __html: serializeJsonLd(websiteStructuredData),

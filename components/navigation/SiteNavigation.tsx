@@ -46,7 +46,7 @@ export function SiteNavigation() {
   }
 
   const renderLinks = () => (
-    <ul className="space-y-1">
+    <ul className="space-y-3.5">
       {siteConfig.navigation.map((item) => {
         const active = isActive(pathname, item.href)
 
@@ -55,10 +55,10 @@ export function SiteNavigation() {
             <Link
               aria-current={active ? 'page' : undefined}
               className={[
-                'block border-l-2 px-3 py-2 text-sm transition-colors',
+                'block py-0.5 text-[15px] leading-5 transition-colors',
                 active
-                  ? 'border-[var(--accent)] text-[var(--foreground)]'
-                  : 'border-transparent text-[var(--muted-foreground)] hover:border-[var(--border)] hover:text-[var(--foreground)]',
+                  ? 'font-medium text-[var(--foreground)]'
+                  : 'font-normal text-[#666666] hover:text-[var(--foreground)]',
               ].join(' ')}
               href={item.href}
               onClick={() => closeMobileNavigation()}
@@ -73,9 +73,9 @@ export function SiteNavigation() {
 
   return (
     <header className="border-b border-[var(--border)] bg-[var(--background)] lg:sticky lg:top-0 lg:h-screen lg:border-b-0 lg:border-r">
-      <div className="flex items-center justify-between px-5 py-4 lg:block lg:px-8 lg:py-10">
+      <div className="flex items-center justify-between px-5 py-4 lg:block lg:py-12 lg:pl-[100px] lg:pr-0">
         <Link
-          className="block text-sm font-semibold"
+          className="block text-[15px] font-medium leading-5"
           href="/"
           onClick={() => closeMobileNavigation()}
         >

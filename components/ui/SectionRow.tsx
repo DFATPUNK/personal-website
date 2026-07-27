@@ -7,11 +7,11 @@ type SectionRowProps = {
 
 export function SectionRow({ title, children }: SectionRowProps) {
   return (
-    <section className="border-b border-[var(--border)] py-8">
-      <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
+    <section className="border-t border-[#dddddd] py-5 sm:grid sm:grid-cols-[140px_1fr] sm:items-start sm:gap-5">
+      <h2 className="self-start pt-1 text-xs font-normal uppercase tracking-[0.06em] text-[var(--muted-foreground)]">
         {title}
       </h2>
-      <div className="mt-4 text-base leading-7 text-[var(--foreground)]">
+      <div className="mt-3 text-[15px] leading-[1.6] text-[var(--muted-foreground)] sm:mt-0">
         {children}
       </div>
     </section>
