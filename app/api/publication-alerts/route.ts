@@ -1,4 +1,3 @@
-import { siteConfig } from '@/lib/site-config'
 import {
   PUBLICATION_ALERT_REQUEST_BODY_MAX_BYTES,
   PUBLICATION_ALERT_RESUBSCRIBE_MESSAGE,
@@ -16,6 +15,7 @@ import {
   isPublicationAlertHoneypotPopulated,
   validatePublicationAlertInput,
 } from '@/lib/publication-alerts/schema'
+import { getPublicationAlertSourceUrl } from '@/lib/publication-alerts/source-url'
 import { readBoundedRequestBody } from '@/lib/server/http'
 
 const jsonHeaders = {
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     source: validation.data.source,
     tags: getPublicationAlertTags(validation.data.source),
     submittedAt: new Date().toISOString(),
-    sourceUrl: getSubmissionSourceUrl(),
+    sourceUrl: getPublicationAlertSourceUrl(request),
   }
 
   try {
@@ -141,12 +141,4 @@ function jsonResponse(body: unknown, status: number) {
     status,
     headers: jsonHeaders,
   })
-}
-
-function getSubmissionSourceUrl() {
-  try {
-    return new URL('/publication-alerts', siteConfig.url).toString()
-  } catch {
-    return 'https://jeremybrunet.com/publication-alerts'
-  }
 }

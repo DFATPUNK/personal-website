@@ -3,9 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { DemoAvailabilityIndicator } from '@/components/ui/DemoAvailabilityIndicator'
-import {
-  type DemoAvailabilityKey,
-} from '@/lib/content/demos'
+import { type DemoAvailabilityKey } from '@/lib/content/demos'
 import {
   demoAvailabilityStates,
   type DemoAvailabilityState,
@@ -28,9 +26,14 @@ export function DemoAvailabilityClient({
   const [state, setState] = useState<DemoAvailabilityState>('unavailable')
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
+  const [retryReady, setRetryReady] = useState(false)
+  const [wakeInFlight, setWakeInFlight] = useState(false)
   const wakeAttemptedRef = useRef(false)
   const wakeFailedRef = useRef(false)
+  const wakeInFlightRef = useRef(false)
   const startedAtRef = useRef(Date.now())
+  const statusRequestCountRef = useRef(0)
+  const retryWakeRef = useRef<(() => void) | null>(null)
 
   const sessionStorageKey = useMemo(
     () => `demo-wake-attempted:${availabilityKey}`,
@@ -42,9 +45,28 @@ export function DemoAvailabilityClient({
     let timer: ReturnType<typeof setTimeout> | undefined
     let stopped = false
 
+    function clearTimer() {
+      if (timer) {
+        clearTimeout(timer)
+        timer = undefined
+      }
+    }
+
+    function schedule(callback: () => void, delay: number) {
+      clearTimer()
+      timer = setTimeout(callback, delay)
+    }
+
+    function canKeepWaiting() {
+      return Date.now() - startedAtRef.current < maxWaitMs
+    }
+
     async function fetchStatus() {
       try {
-        const response = await fetch(getStatusUrl(), {
+        const statusRequestCount = statusRequestCountRef.current
+        statusRequestCountRef.current += 1
+
+        const response = await fetch(getStatusUrl(statusRequestCount), {
           cache: 'no-store',
           signal: controller.signal,
         })
@@ -69,10 +91,14 @@ export function DemoAvailabilityClient({
         setState(nextState)
         setLoading(false)
         setMessage('')
+        setRetryReady(false)
 
         if (mode === 'context') {
           await handleContextState(nextState)
+          return
         }
+
+        handleIndexState(nextState)
       } catch {
         if (controller.signal.aborted || stopped) {
           return
@@ -81,6 +107,13 @@ export function DemoAvailabilityClient({
         setState('unavailable')
         setLoading(false)
         setMessage('Status is temporarily unavailable.')
+        setRetryReady(false)
+      }
+    }
+
+    function handleIndexState(nextState: DemoAvailabilityState) {
+      if (nextState === 'waking' && canKeepWaiting()) {
+        schedule(fetchStatus, pollMs)
       }
     }
 
@@ -97,21 +130,27 @@ export function DemoAvailabilityClient({
 
         if (canAttemptWake) {
           wakeAttemptedRef.current = true
-          window.sessionStorage.setItem(sessionStorageKey, 'true')
           await requestWake()
           return
         }
       }
 
-      if (
-        nextState === 'waking' &&
-        Date.now() - startedAtRef.current < maxWaitMs
-      ) {
-        timer = setTimeout(fetchStatus, pollMs)
+      if (nextState === 'waking' && canKeepWaiting()) {
+        schedule(fetchStatus, pollMs)
       }
     }
 
     async function requestWake() {
+      if (wakeInFlightRef.current) {
+        return
+      }
+
+      wakeInFlightRef.current = true
+      window.sessionStorage.setItem(sessionStorageKey, 'true')
+      setWakeInFlight(true)
+      setRetryReady(false)
+      clearTimer()
+
       try {
         const response = await fetch(getWakeUrl(availabilityKey), {
           method: 'POST',
@@ -140,23 +179,43 @@ export function DemoAvailabilityClient({
           return
         }
 
+        wakeFailedRef.current = false
         setState('waking')
         setLoading(false)
+        setRetryReady(false)
         setMessage('Starting the database. This can take a few minutes.')
-        timer = setTimeout(fetchStatus, pollMs)
+        schedule(fetchStatus, pollMs)
       } catch {
         if (controller.signal.aborted || stopped) {
           return
         }
 
         wakeFailedRef.current = true
+        window.sessionStorage.removeItem(sessionStorageKey)
         setState('inactive')
         setLoading(false)
+        setRetryReady(false)
         setMessage(
           'Wake-up could not start. You can retry after a short pause.',
         )
-        timer = setTimeout(fetchStatus, retryDelayMs)
+        schedule(() => {
+          if (!stopped) {
+            setRetryReady(true)
+          }
+        }, getRetryDelayMs())
+      } finally {
+        wakeInFlightRef.current = false
+
+        if (!stopped) {
+          setWakeInFlight(false)
+        }
       }
+    }
+
+    retryWakeRef.current = () => {
+      wakeFailedRef.current = false
+      wakeAttemptedRef.current = true
+      void requestWake()
     }
 
     fetchStatus()
@@ -164,10 +223,8 @@ export function DemoAvailabilityClient({
     return () => {
       stopped = true
       controller.abort()
-
-      if (timer) {
-        clearTimeout(timer)
-      }
+      retryWakeRef.current = null
+      clearTimer()
     }
   }, [availabilityKey, mode, sessionStorageKey])
 
@@ -179,11 +236,21 @@ export function DemoAvailabilityClient({
           {message}
         </span>
       ) : null}
+      {mode === 'context' && retryReady ? (
+        <button
+          className="demo-availability__retry"
+          disabled={wakeInFlight}
+          onClick={() => retryWakeRef.current?.()}
+          type="button"
+        >
+          Retry wake-up
+        </button>
+      ) : null}
     </span>
   )
 }
 
-function getStatusUrl() {
+function getStatusUrl(statusRequestCount: number) {
   if (typeof window === 'undefined') {
     return '/api/demos/availability'
   }
@@ -192,7 +259,7 @@ function getStatusUrl() {
   const fixture = search.get('availabilityFixture')
 
   return fixture
-    ? `/api/demos/availability?fixture=${encodeURIComponent(fixture)}`
+    ? `/api/demos/availability?fixture=${encodeURIComponent(fixture)}&step=${statusRequestCount}`
     : '/api/demos/availability'
 }
 
@@ -209,13 +276,29 @@ function getWakeUrl(key: DemoAvailabilityKey) {
 }
 
 function isLocalWakeGuardEnabled() {
-  if (
-    typeof window === 'undefined' ||
-    (process.env.NODE_ENV === 'production' &&
-      process.env.NEXT_PUBLIC_SCREENSHOT_FIXTURES !== '1')
-  ) {
+  if (!isLocalFixtureRuntime()) {
     return false
   }
 
   return new URLSearchParams(window.location.search).get('wakeGuard') === '1'
+}
+
+function getRetryDelayMs() {
+  if (
+    typeof window !== 'undefined' &&
+    isLocalFixtureRuntime() &&
+    new URLSearchParams(window.location.search).get('wakeRetryReady') === '1'
+  ) {
+    return 0
+  }
+
+  return retryDelayMs
+}
+
+function isLocalFixtureRuntime() {
+  return !(
+    typeof window === 'undefined' ||
+    (process.env.NODE_ENV === 'production' &&
+      process.env.NEXT_PUBLIC_SCREENSHOT_FIXTURES !== '1')
+  )
 }

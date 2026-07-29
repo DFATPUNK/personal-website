@@ -62,8 +62,9 @@ describe('essay content foundation', () => {
     expect(essay?.slug).toBe(
       'how-to-manage-automations-event-driven-database',
     )
-    expect(essay?.metadata.title).toBe(
-      'How to manage automations to build an event-driven database? A full, comprehensive walkthrough to design a complete automated data collection system.',
+    expect(essay?.metadata.title).toBe('Event-driven databases 101')
+    expect(essay?.metadata.description).toBe(
+      'A practical walkthrough for building databases designed to manage processors, jobs, and data outputs.',
     )
     expect(essay?.metadata.status).toBe('in-progress')
     expect(essay?.metadata.announcedAt).toBe('2026-07-27')
@@ -79,6 +80,46 @@ describe('essay content foundation', () => {
       'event-driven-architecture',
       'apis',
     ])
+  })
+
+  it('renders the approved in-progress essay presentation copy', () => {
+    const mdx = fs.readFileSync(
+      path.join(
+        process.cwd(),
+        'content/essays/how-to-manage-automations-event-driven-database.mdx',
+      ),
+      'utf8',
+    )
+    const essaysPage = fs.readFileSync(
+      path.join(process.cwd(), 'app/(site)/essays/page.tsx'),
+      'utf8',
+    )
+    const standardEssay = fs.readFileSync(
+      path.join(process.cwd(), 'components/mdx/StandardEssay.tsx'),
+      'utf8',
+    )
+    const body = mdx.split('---').slice(2).join('---').trim()
+    const blocks = body.split(/\n{2,}/)
+
+    expect(essaysPage).toContain("{isInProgress ? 'TBD' : formatEssayDate(sortDate)}")
+    expect(essaysPage).not.toContain('July 27, 2026')
+    expect(standardEssay).toContain('- Publication TBD')
+    expect(standardEssay).toContain('Announced')
+    expect(standardEssay).toContain('<time dateTime={displayDate}>')
+    expect(blocks).toEqual([
+      '_This essay is currently being written._',
+      'Event-driven architecture is instrumental in designing databases for complex automated systems. These databases not only list processors representing automations and jobs representing their runs; they also manage data outputs by type and completion status.',
+      'This walkthrough will cover the key techniques for building a reliable and scalable event-driven database, including all database and automation templates used in the demonstrations.',
+    ])
+    expect(mdx).toContain('_This essay is currently being written._')
+    expect(mdx).toContain(
+      'Event-driven architecture is instrumental in designing databases for complex automated systems. These databases not only list processors representing automations and jobs representing their runs; they also manage data outputs by type and completion status.',
+    )
+    expect(mdx).toContain(
+      'This walkthrough will cover the key techniques for building a reliable and scalable event-driven database, including all database and automation templates used in the demonstrations.',
+    )
+    expect(mdx).not.toContain('public now so readers can see the shape')
+    expect(mdx).not.toContain('pretending every automation result is complete')
   })
 
   it('publishes the expected external Medium references', () => {

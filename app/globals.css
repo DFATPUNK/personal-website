@@ -260,6 +260,8 @@ article :where(h1, h2, h3, p, li, blockquote) {
 
 .publication-alert--compact {
   max-width: var(--content-width);
+  border-top: 0;
+  padding-top: 0;
 }
 
 .publication-alert__fields {
@@ -297,6 +299,19 @@ article :where(h1, h2, h3, p, li, blockquote) {
   opacity: 0.65;
 }
 
+.demo-availability__retry {
+  width: fit-content;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent);
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.demo-availability__retry:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
 .publication-alert__honeypot {
   position: absolute;
   left: -10000px;
@@ -320,13 +335,20 @@ article :where(h1, h2, h3, p, li, blockquote) {
 
 @media (min-width: 768px) {
   .publication-alert--compact {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(17rem, 0.8fr);
-    column-gap: 1rem;
+    max-width: 34rem;
   }
 
   .publication-alert--compact .publication-alert__fields {
-    margin-top: 0;
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .publication-alert--compact .publication-alert__input {
+    min-width: 0;
+  }
+
+  .publication-alert--compact .publication-alert__button {
+    flex: 0 0 auto;
   }
 }
 

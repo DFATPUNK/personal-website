@@ -57,6 +57,14 @@ requests are never cached. When the integration variables are absent or n8n
 cannot be reached, Alan and MLP safely render `Unavailable`; launch and source
 links remain usable.
 
+The `/demos` index fetches status and refreshes only while a displayed Alan or
+MLP status is `waking`; it never calls the wake endpoint. Alan and MLP context
+pages may submit one automatic wake request per browser session when a demo is
+`inactive`. If that wake request fails, the browser clears its convenience
+session guard and shows a discreet `Retry wake-up` control after a short pause.
+Retrying is explicit, rate-limited by the UI state, and n8n remains the
+authoritative deduplication boundary.
+
 ## Observed Route Discrepancy
 
 The `DFATPUNK/demos` UI currently links two demos with descriptive local paths:

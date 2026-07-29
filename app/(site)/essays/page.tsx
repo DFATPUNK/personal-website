@@ -50,7 +50,7 @@ export default function EssaysPage() {
                 <div className="mb-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-[var(--muted-foreground)]">
                   {sortDate ? (
                     <time dateTime={sortDate}>
-                      {formatEssayDate(sortDate)}
+                      {isInProgress ? 'TBD' : formatEssayDate(sortDate)}
                     </time>
                   ) : null}
                   {isExternal ? (
@@ -105,7 +105,7 @@ export default function EssaysPage() {
                 {isInProgress && essay.metadata.interestSource ? (
                   <div className="mt-5">
                     <PublicationAlertForm
-                      compact
+                      variant="compact"
                       source={essay.metadata.interestSource}
                     />
                   </div>

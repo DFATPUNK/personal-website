@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   PUBLICATION_ALERT_BUTTON_LABEL,
+  PUBLICATION_ALERT_COMPACT_BUTTON_LABEL,
+  PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER,
   PUBLICATION_ALERT_EMAIL_LABEL,
   PUBLICATION_ALERT_EMAIL_PLACEHOLDER,
   PUBLICATION_ALERT_HELPER,
@@ -37,14 +39,22 @@ const {
   deliverPublicationAlertSubmission,
 } = await import('@/lib/publication-alerts/delivery')
 const { POST } = await import('../app/api/publication-alerts/route')
+const { getPublicationAlertSourceUrl } = await import(
+  '../lib/publication-alerts/source-url'
+)
 
 const mockedDeliver = vi.mocked(deliverPublicationAlertSubmission)
 
-function alertRequest(body: unknown, contentType = 'application/json') {
+function alertRequest(
+  body: unknown,
+  contentType = 'application/json',
+  headers?: Record<string, string>,
+) {
   return new Request('http://localhost:3000/api/publication-alerts', {
     method: 'POST',
     headers: {
       'Content-Type': contentType,
+      ...headers,
     },
     body: typeof body === 'string' ? body : JSON.stringify(body),
   })
@@ -122,7 +132,12 @@ describe('publication alerts', () => {
   it('delivers a valid signup as an idempotent success', async () => {
     mockedDeliver.mockResolvedValue({ ok: true, status: 'subscribed' })
 
-    const response = await POST(alertRequest(validBody()))
+    const response = await POST(
+      alertRequest(validBody(), 'application/json', {
+        Referer:
+          'https://jeremybrunet.com/essays/how-to-manage-automations-event-driven-database',
+      }),
+    )
     const body = await readJson(response)
 
     expect(response.status).toBe(200)
@@ -134,6 +149,8 @@ describe('publication alerts', () => {
       expect.objectContaining({
         email: 'person@example.com',
         source: 'essay:event-driven-database',
+        sourceUrl:
+          'https://jeremybrunet.com/essays/how-to-manage-automations-event-driven-database',
         tags: ['publication-alerts', 'source:essay-event-driven-database'],
       }),
     )
@@ -198,7 +215,7 @@ describe('publication alerts', () => {
     expect(body.message).toBe(PUBLICATION_ALERT_RESUBSCRIBE_MESSAGE)
   })
 
-  it('uses exact public form copy and links to privacy', () => {
+  it('uses exact public form copy and explicit compact/full variants', () => {
     const source = fs.readFileSync(
       path.join(process.cwd(), 'components/ui/PublicationAlertForm.tsx'),
       'utf8',
@@ -216,10 +233,50 @@ describe('publication alerts', () => {
     )
     expect(PUBLICATION_ALERT_EMAIL_LABEL).toBe('Email address')
     expect(PUBLICATION_ALERT_EMAIL_PLACEHOLDER).toBe('you@example.com')
+    expect(PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER).toBe(
+      'email@example.com',
+    )
     expect(PUBLICATION_ALERT_BUTTON_LABEL).toBe('Notify me')
+    expect(PUBLICATION_ALERT_COMPACT_BUTTON_LABEL).toBe(
+      'Get publication alerts',
+    )
     expect(PUBLICATION_ALERT_SUCCESS_MESSAGE).toBe("You're on the list.")
+    expect(source).toContain("variant?: 'compact' | 'full'")
+    expect(source).toContain("const isCompact = variant === 'compact'")
+    expect(source).toContain('isCompact ? null :')
     expect(source).toContain('href="/privacy"')
+    expect(source).toContain('PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER')
+    expect(source).toContain('PUBLICATION_ALERT_COMPACT_BUTTON_LABEL')
     expect(source).not.toContain('checkbox')
     expect(essaysPage).toContain('PublicationAlertForm')
+    expect(essaysPage).toContain('variant="compact"')
+  })
+
+  it('keeps source URLs same-origin and ignores untrusted client URLs', () => {
+    expect(
+      getPublicationAlertSourceUrl(
+        alertRequest(validBody(), 'application/json', {
+          Referer:
+            'https://jeremybrunet.com/essays/how-to-manage-automations-event-driven-database',
+        }),
+      ),
+    ).toBe(
+      'https://jeremybrunet.com/essays/how-to-manage-automations-event-driven-database',
+    )
+
+    expect(
+      getPublicationAlertSourceUrl(
+        alertRequest(validBody(), 'application/json', {
+          Referer: 'https://attacker.example/phish',
+        }),
+      ),
+    ).toBe('https://jeremybrunet.com/')
+
+    const result = validatePublicationAlertInput({
+      ...validBody(),
+      sourceUrl: 'https://attacker.example/phish',
+    })
+
+    expect(result.ok).toBe(false)
   })
 })

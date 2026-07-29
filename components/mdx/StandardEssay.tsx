@@ -43,10 +43,19 @@ export function StandardEssay({ essay }: { essay: Essay }) {
         <div className="mt-5 space-y-3 text-sm text-[var(--muted-foreground)]">
           {displayDate ? (
             <p>
-              {isInProgress ? 'Announced' : 'Published'}{' '}
-              <time dateTime={displayDate}>
-                {formatEssayDate(displayDate)}
-              </time>
+              {isInProgress ? (
+                <>
+                  Announced{' '}
+                  <time dateTime={displayDate}>
+                    {formatEssayDate(displayDate)}
+                  </time>{' '}
+                  - Publication TBD
+                </>
+              ) : (
+                <>
+                  Published <time dateTime={displayDate}>{formatEssayDate(displayDate)}</time>
+                </>
+              )}
             </p>
           ) : null}
           {isInProgress ? (

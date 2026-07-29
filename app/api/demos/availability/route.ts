@@ -79,6 +79,23 @@ function getLocalFixture(request: Request) {
     }
   }
 
+  if (fixture === 'alan-inactive') {
+    return {
+      alan: { key: 'alan', state: 'inactive', checkedAt },
+      mlp: { key: 'mlp', state: 'active', checkedAt },
+    }
+  }
+
+  if (fixture === 'waking-active') {
+    const step = Number(url.searchParams.get('step') ?? '0')
+    const state = Number.isFinite(step) && step >= 1 ? 'active' : 'waking'
+
+    return {
+      alan: { key: 'alan', state, checkedAt },
+      mlp: { key: 'mlp', state: 'active', checkedAt },
+    }
+  }
+
   if (fixture === 'unavailable') {
     return {
       alan: { key: 'alan', state: 'unavailable', checkedAt },

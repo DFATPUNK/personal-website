@@ -15,8 +15,10 @@ This checklist tracks human-supplied content required before `v2` is merged to
 - Demo wording/topic review for the existing public demos.
 - MLP public demo entry.
 - Contact-page copy review, including the subject selector and HR example.
-- In-progress flagship essay announcement and context page.
-- Reusable publication-alert signup form for major essays and demos.
+- In-progress flagship essay announcement and context page for
+  `Event-driven databases 101`.
+- Reusable publication-alert signup form for major essays and demos, with
+  compact index and full context-page variants.
 
 ## Still required before release
 

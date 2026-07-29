@@ -5,6 +5,8 @@ import { FormEvent, useId, useState } from 'react'
 
 import {
   PUBLICATION_ALERT_BUTTON_LABEL,
+  PUBLICATION_ALERT_COMPACT_BUTTON_LABEL,
+  PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER,
   PUBLICATION_ALERT_EMAIL_LABEL,
   PUBLICATION_ALERT_EMAIL_PLACEHOLDER,
   PUBLICATION_ALERT_HELPER,
@@ -13,14 +15,14 @@ import {
 
 type PublicationAlertFormProps = {
   source: string
-  compact?: boolean
+  variant?: 'compact' | 'full'
 }
 
 type SubmissionState = 'idle' | 'submitting' | 'success' | 'error'
 
 export function PublicationAlertForm({
   source,
-  compact = false,
+  variant = 'full',
 }: PublicationAlertFormProps) {
   const emailId = useId()
   const messageId = useId()
@@ -28,6 +30,14 @@ export function PublicationAlertForm({
   const [website, setWebsite] = useState('')
   const [state, setState] = useState<SubmissionState>('idle')
   const [message, setMessage] = useState('')
+
+  const isCompact = variant === 'compact'
+  const placeholder = isCompact
+    ? PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER
+    : PUBLICATION_ALERT_EMAIL_PLACEHOLDER
+  const buttonLabel = isCompact
+    ? PUBLICATION_ALERT_COMPACT_BUTTON_LABEL
+    : PUBLICATION_ALERT_BUTTON_LABEL
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -90,20 +100,24 @@ export function PublicationAlertForm({
 
   return (
     <form
-      className={compact ? 'publication-alert publication-alert--compact' : 'publication-alert'}
+      className={
+        isCompact ? 'publication-alert publication-alert--compact' : 'publication-alert'
+      }
       onSubmit={handleSubmit}
     >
-      <div className="publication-alert__copy">
-        <p className="text-sm leading-6 text-[var(--foreground)]">
-          {PUBLICATION_ALERT_INVITATION}
-        </p>
-        <p className="mt-1 text-xs leading-5 text-[var(--muted-foreground)]">
-          {PUBLICATION_ALERT_HELPER}{' '}
-          <Link className="border-b border-[var(--border)]" href="/privacy">
-            Privacy
-          </Link>
-        </p>
-      </div>
+      {isCompact ? null : (
+        <div className="publication-alert__copy">
+          <p className="text-sm leading-6 text-[var(--foreground)]">
+            {PUBLICATION_ALERT_INVITATION}
+          </p>
+          <p className="mt-1 text-xs leading-5 text-[var(--muted-foreground)]">
+            {PUBLICATION_ALERT_HELPER}{' '}
+            <Link className="border-b border-[var(--border)]" href="/privacy">
+              Privacy
+            </Link>
+          </p>
+        </div>
+      )}
       <div className="publication-alert__fields">
         <label className="sr-only" htmlFor={emailId}>
           {PUBLICATION_ALERT_EMAIL_LABEL}
@@ -116,7 +130,7 @@ export function PublicationAlertForm({
           maxLength={254}
           name="email"
           onChange={(event) => setEmail(event.target.value)}
-          placeholder={PUBLICATION_ALERT_EMAIL_PLACEHOLDER}
+          placeholder={placeholder}
           required
           type="email"
           value={email}
@@ -140,7 +154,7 @@ export function PublicationAlertForm({
           disabled={state === 'submitting'}
           type="submit"
         >
-          {state === 'submitting' ? 'Sending...' : PUBLICATION_ALERT_BUTTON_LABEL}
+          {state === 'submitting' ? 'Sending...' : buttonLabel}
         </button>
       </div>
       <p

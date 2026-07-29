@@ -38,11 +38,22 @@ describe('demo availability UI source', () => {
     expect(css).toContain('animation: none')
   })
 
-  it('does not wake from the demos index', () => {
+  it('polls waking index statuses without waking from the demos index', () => {
     expect(demosIndex).toContain('mode="index"')
+    expect(client).toContain('handleIndexState(nextState)')
+    expect(client).toContain("nextState === 'waking' && canKeepWaiting()")
     expect(client).toContain("mode === 'context'")
+    expect(client).toContain("method: 'POST'")
     expect(client).toContain('window.sessionStorage.getItem(sessionStorageKey)')
     expect(client).toContain('window.sessionStorage.setItem(sessionStorageKey')
+    expect(client).toContain('window.sessionStorage.removeItem(sessionStorageKey)')
+    expect(client).toContain('Retry wake-up')
+    expect(client).toContain('setRetryReady(true)')
+    expect(client).toContain('disabled={wakeInFlight}')
+    expect(client).toContain('wakeInFlightRef.current')
+    expect(client).toContain('getRetryDelayMs()')
+    expect(client).toContain('availabilityFixture')
+    expect(client).toContain('step=${statusRequestCount}')
     expect(client).toContain('clearTimeout(timer)')
     expect(client).toContain('controller.abort()')
   })

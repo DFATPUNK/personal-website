@@ -114,7 +114,15 @@ The essays index should default to a simple reverse-chronological list.
 context route. They remain out of the sitemap until they become `published`,
 use `noindex, follow`, and do not emit published Article JSON-LD. Sort public
 entries by `publishedAt` for `published` and `external` entries, and by
-`announcedAt` for `in-progress` entries.
+`announcedAt` for `in-progress` entries. The `/essays` index displays `TBD`
+for the date of an `in-progress` entry while retaining `announcedAt` internally
+for sorting and for the context-page announcement line.
+
+In-progress essays can pass `interestSource` to the reusable
+`PublicationAlertForm`. Use the `compact` form variant on index cards, where
+only the accessible email input, submit button, and live validation/success
+message render. Use the `full` variant on context pages so the invitation,
+helper copy, and Privacy link remain visible before submission.
 
 The essay renderer supports two layout values:
 

@@ -64,6 +64,13 @@ Article JSON-LD. To publish later, change the status to `published`, add
 `publishedAt`, review the page content as the finished essay, and verify the
 sitemap and structured data.
 
+The essays index shows `TBD` for in-progress entries while still using
+`announcedAt` for ordering. Use the compact publication-alert form on the index:
+it renders only the accessible email input, `Get publication alerts` button,
+and any live validation/success/error message. Use the full form on the context
+page, where the invitation, helper copy, Privacy link, `you@example.com`
+placeholder, and `Notify me` CTA remain visible.
+
 ## Add an external essay reference
 
 Use `status: external`, include `externalUrl`, a date, and registered topic

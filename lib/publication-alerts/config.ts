@@ -4,7 +4,9 @@ export const PUBLICATION_ALERT_HELPER =
   'No newsletter. Only occasional publication alerts. Unsubscribe anytime.'
 export const PUBLICATION_ALERT_EMAIL_LABEL = 'Email address'
 export const PUBLICATION_ALERT_EMAIL_PLACEHOLDER = 'you@example.com'
+export const PUBLICATION_ALERT_COMPACT_EMAIL_PLACEHOLDER = 'email@example.com'
 export const PUBLICATION_ALERT_BUTTON_LABEL = 'Notify me'
+export const PUBLICATION_ALERT_COMPACT_BUTTON_LABEL = 'Get publication alerts'
 export const PUBLICATION_ALERT_SUCCESS_MESSAGE = "You're on the list."
 export const PUBLICATION_ALERT_UNAVAILABLE_MESSAGE =
   'Publication alerts are temporarily unavailable. Please try again later.'
