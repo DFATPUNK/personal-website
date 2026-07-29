@@ -29,9 +29,8 @@ This checklist tracks human-supplied content required before `v2` is merged to
 - Vercel `CONTACT_WEBHOOK_URL` production configuration if still unset.
 - Vercel demo availability webhook URLs and signing secret.
 - Vercel publication-alert webhook URL and signing secret.
-- n8n Supabase Management API, Alan/MLP project refs, health-check URLs and
-  anon keys, Mailchimp Marketing API credential, server prefix, Audience ID,
-  and matching signing secrets.
+- n8n Supabase Management API token, Alan/MLP project refs, Mailchimp Marketing
+  API credential, server prefix, Audience ID, and matching signing secrets.
 - Final review of the `v2 -> main` release PR.
 - Any unresolved defects found during final QA.
 

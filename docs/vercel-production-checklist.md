@@ -48,10 +48,16 @@ This is the manual checklist for the later release pull request from `v2` to
 - `CONTACT_WEBHOOK_URL` is configured for Production before launch.
 - `DEMO_STATUS_WEBHOOK_URL`, `DEMO_WAKE_WEBHOOK_URL`, and
   `DEMO_WEBHOOK_SIGNING_SECRET` are configured only when the n8n/Supabase
-  workflows are ready.
+  workflows are ready. `DEMO_STATUS_WEBHOOK_URL` must be the active production
+  URL of the n8n status Webhook trigger, and `DEMO_WAKE_WEBHOOK_URL` must be
+  the active production URL of the n8n wake Webhook trigger. Do not use n8n Test
+  URLs for persistent Vercel configuration.
 - `PUBLICATION_ALERTS_WEBHOOK_URL` and
   `PUBLICATION_ALERTS_WEBHOOK_SIGNING_SECRET` are configured only when the
-  n8n/Mailchimp workflow is ready.
+  n8n/Mailchimp workflow is ready. `PUBLICATION_ALERTS_WEBHOOK_URL` must be the
+  active production URL of the n8n publication-alert Webhook trigger.
+- Signing-secret values match between n8n and Vercel.
+- Vercel environment-variable changes are followed by a new deployment.
 - `NEXT_PUBLIC_SITE_URL=https://jeremybrunet.com` is configured if the project
   configuration requires an explicit value.
 - `jeremybrunet.com` remains the canonical domain.
@@ -75,13 +81,21 @@ This is the manual checklist for the later release pull request from `v2` to
 
 n8n, not Git, must hold:
 
-- Supabase Management API access token.
-- Alan and MLP Supabase project refs.
-- Alan and MLP Supabase URLs and anon keys for REST health checks.
-- Mailchimp Marketing API key.
-- Mailchimp server prefix.
-- Mailchimp Audience ID.
-- Signing secrets matching the Vercel server-only values.
+```txt
+SUPABASE_MANAGEMENT_TOKEN
+ALAN_SUPABASE_PROJECT_REF
+MLP_SUPABASE_PROJECT_REF
+DEMO_WEBHOOK_SIGNING_SECRET
+MAILCHIMP_API_KEY
+MAILCHIMP_SERVER_PREFIX
+MAILCHIMP_AUDIENCE_ID
+PUBLICATION_ALERTS_WEBHOOK_SIGNING_SECRET
+```
+
+The Supabase Management token needs `project_admin_read` for project state and
+service health, and `project_admin_write` for project restore. Alan and MLP
+Supabase project URLs, anon keys, publishable keys, and direct `/rest/v1/`
+health checks are not required for the availability workflows.
 
 Do not create `NEXT_PUBLIC_*` variables for webhook URLs, signing secrets,
 Supabase credentials, or Mailchimp credentials. The production build must pass
