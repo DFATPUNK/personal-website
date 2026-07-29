@@ -42,13 +42,13 @@ describe('profile content', () => {
     expect(careerEntries[0]?.summary).toContain('over 100 databases')
     expect(careerEntries[0]?.summary).toContain('more than 50 companies')
     expect(careerEntries[0]?.summary).toContain(
-      'eliminate over 20,000 hours of manual work',
+      'automate over 20,000 hours of operational work',
     )
     expect(careerEntries[0]?.summary).toBe(
-      'Over seven years building data architectures, API integrations, and automated workflows. As Data & Automation Lead at the no-code and low-code agency Automate Me, I designed and delivered more than 1,000 automations across Zapier, n8n, Make, and Parabola, as well as over 100 databases using Airtable, Supabase, and Firebase. I helped more than 50 companies eliminate over 20,000 hours of manual work.',
+      '7+ years building data architectures, API integrations, and automated workflows. As Data & Automation Lead at the no-code and low-code agency Automate Me, I designed and delivered more than 1,000 automations across Zapier, n8n, Make, and Parabola, to name a few, as well as over 100 databases, mostly using Airtable, Supabase, and Firebase. I helped more than 50 companies automate over 20,000 hours of operational work.',
     )
     expect(careerEntries[1]?.summary).toBe(
-      'Over two years building a peer-to-peer educational chatbot that helped K–12 students work on their homework together after school. My first entrepreneurial venture and a practical introduction to APIs, algorithms, data analysis, and workflow automation. Worked across product, data, community, and technical support.',
+      '2+ years building a peer-to-peer educational Messenger chatbot that helped K–12 students work on their homework together after school. My first entrepreneurial venture and a practical introduction to APIs, algorithms, data architecture, and KPIs tracking. Worked across product, data, community, and technical support.',
     )
   })
 

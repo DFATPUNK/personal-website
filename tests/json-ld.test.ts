@@ -42,6 +42,7 @@ describe('json-ld serialization', () => {
     expect(standardEssay).toContain("import { serializeJsonLd }")
     expect(rootLayout).toContain('serializeJsonLd(websiteStructuredData)')
     expect(standardEssay).toContain('serializeJsonLd(articleStructuredData)')
+    expect(standardEssay).toContain('isInProgress ? null')
     expect(rootLayout).not.toContain('JSON.stringify(websiteStructuredData)')
     expect(standardEssay).not.toContain('JSON.stringify(articleStructuredData)')
   })

@@ -8,6 +8,7 @@ import {
   getDemoInternalPath,
   getDemoStaticParams,
   getPublicDemos,
+  isDemoAvailabilityKey,
   validateDemoCollection,
 } from '../lib/content/demos'
 import { isTopicSlug } from '../lib/topics/registry'
@@ -15,10 +16,10 @@ import { isTopicSlug } from '../lib/topics/registry'
 describe('demo registry', () => {
   it('publishes the expected canonical demo slugs', () => {
     expect(getPublicDemos().map((demo) => demo.slug)).toEqual([
+      'mlp',
+      'pg-calculator',
       'alan',
       'balatro',
-      'pg-calculator',
-      'mlp',
     ])
   })
 
@@ -41,10 +42,10 @@ describe('demo registry', () => {
   it('keeps ordering deterministic', () => {
     expect(getAllDemos().map((demo) => demo.order)).toEqual([10, 20, 30, 40])
     expect(getAllDemos().map((demo) => demo.slug)).toEqual([
+      'mlp',
+      'pg-calculator',
       'alan',
       'balatro',
-      'pg-calculator',
-      'mlp',
     ])
   })
 
@@ -205,17 +206,49 @@ describe('demo registry', () => {
     const demos = getPublicDemos()
 
     expect(demos.map(getDemoInternalPath)).toEqual([
+      '/demos/mlp',
+      '/demos/pg-calculator',
       '/demos/alan',
       '/demos/balatro',
-      '/demos/pg-calculator',
-      '/demos/mlp',
     ])
     expect(getDemoStaticParams()).toEqual([
+      { slug: 'mlp' },
+      { slug: 'pg-calculator' },
       { slug: 'alan' },
       { slug: 'balatro' },
-      { slug: 'pg-calculator' },
-      { slug: 'mlp' },
     ])
+  })
+
+  it('limits Supabase availability metadata to Alan and MLP safe keys', () => {
+    const availability = getPublicDemos()
+      .filter((demo) => demo.availability)
+      .map((demo) => ({
+        slug: demo.slug,
+        availability: demo.availability,
+      }))
+
+    expect(availability).toEqual([
+      {
+        slug: 'mlp',
+        availability: {
+          provider: 'supabase',
+          key: 'mlp',
+        },
+      },
+      {
+        slug: 'alan',
+        availability: {
+          provider: 'supabase',
+          key: 'alan',
+        },
+      },
+    ])
+    expect(isDemoAvailabilityKey('alan')).toBe(true)
+    expect(isDemoAvailabilityKey('mlp')).toBe(true)
+    expect(isDemoAvailabilityKey('pg-calculator')).toBe(false)
+    expect(JSON.stringify(availability)).not.toMatch(
+      /project|token|anon|webhook|secret|supabase\.co/i,
+    )
   })
 
   it('rejects duplicate demo slugs', () => {

@@ -23,6 +23,7 @@ describe('seo foundation', () => {
     expect(urls).toContain('https://jeremybrunet.com/essays')
     expect(urls).toContain('https://jeremybrunet.com/demos')
     expect(urls).toContain('https://jeremybrunet.com/contact')
+    expect(urls).toContain('https://jeremybrunet.com/privacy')
 
     for (const demo of getPublicDemos()) {
       expect(urls).toContain(
@@ -36,6 +37,9 @@ describe('seo foundation', () => {
 
     expect(urls).not.toContain(
       'https://jeremybrunet.com/essays/foundation-sample',
+    )
+    expect(urls).not.toContain(
+      'https://jeremybrunet.com/essays/how-to-manage-automations-event-driven-database',
     )
     expect(urls).toContain('https://jeremybrunet.com/demos/mlp')
     expect(urls).not.toContain(

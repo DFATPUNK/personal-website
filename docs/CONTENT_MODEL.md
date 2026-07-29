@@ -87,7 +87,7 @@ featured: true
 Minimum TypeScript model:
 
 ```ts
-export type EssayStatus = "draft" | "published" | "external"
+export type EssayStatus = "draft" | "published" | "external" | "in-progress"
 export type EssayLayout = "standard" | "immersive"
 
 export type EssayMetadata = {
@@ -95,6 +95,7 @@ export type EssayMetadata = {
   slug: string
   description: string
   publishedAt?: string
+  announcedAt?: string
   updatedAt?: string
   status: EssayStatus
   layout: EssayLayout
@@ -102,10 +103,26 @@ export type EssayMetadata = {
   featured?: boolean
   externalUrl?: string
   repositoryUrl?: string
+  interestSource?: string
 }
 ```
 
 The essays index should default to a simple reverse-chronological list.
+
+`in-progress` entries are public announcement/context pages. They require
+`announcedAt`, appear on `/essays`, enter static params, and render a local
+context route. They remain out of the sitemap until they become `published`,
+use `noindex, follow`, and do not emit published Article JSON-LD. Sort public
+entries by `publishedAt` for `published` and `external` entries, and by
+`announcedAt` for `in-progress` entries. The `/essays` index displays `TBD`
+for the date of an `in-progress` entry while retaining `announcedAt` internally
+for sorting and for the context-page announcement line.
+
+In-progress essays can pass `interestSource` to the reusable
+`PublicationAlertForm`. Use the `compact` form variant on index cards, where
+only the accessible email input, submit button, and live validation/success
+message render. Use the `full` variant on context pages so the invitation,
+helper copy, and Privacy link remain visible before submission.
 
 The essay renderer supports two layout values:
 
@@ -175,8 +192,16 @@ export type Demo = {
   href: `/demos/${string}`
   repositoryUrl?: string
   featured?: boolean
+  availability?: {
+    provider: "supabase"
+    key: "alan" | "mlp"
+  }
 }
 ```
+
+Availability metadata must expose only a logical allowlisted key. Do not store
+Supabase project refs, Supabase keys, n8n URLs, or secrets in the public demo
+registry.
 
 The demo registry should live in one file:
 

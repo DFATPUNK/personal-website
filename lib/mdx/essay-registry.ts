@@ -1,4 +1,5 @@
 import FoundationSampleEssay from '@/content/essays/foundation-sample.mdx'
+import EventDrivenDatabaseEssay from '@/content/essays/how-to-manage-automations-event-driven-database.mdx'
 import type { Essay } from '@/lib/content/essays'
 import type { ComponentType } from 'react'
 
@@ -7,6 +8,8 @@ type ImmersiveEssayComponent = ComponentType<{ essay: Essay }>
 
 const standardEssayRegistry: Record<string, MdxEssayComponent> = {
   'foundation-sample': FoundationSampleEssay,
+  'how-to-manage-automations-event-driven-database':
+    EventDrivenDatabaseEssay,
 }
 
 const immersiveEssayRegistry: Record<string, ImmersiveEssayComponent> = {}
