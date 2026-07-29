@@ -27,8 +27,8 @@ This checklist tracks human-supplied content required before `v2` is merged to
 - Removal or continued non-publication of the temporary `foundation-sample`
   essay.
 - Vercel `CONTACT_WEBHOOK_URL` production configuration if still unset.
-- Vercel demo availability status, health, and wake webhook URLs, signing
-  secret, and Alan/MLP project refs.
+- Vercel demo availability status and wake webhook URLs, signing secret, and
+  Alan/MLP project refs.
 - Vercel publication-alert webhook URL and signing secret.
 - n8n Supabase Management API token, Alan/MLP project refs, Mailchimp Marketing
   API credential, server prefix, Audience ID, and matching signing secrets.

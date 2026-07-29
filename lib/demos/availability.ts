@@ -32,23 +32,11 @@ const projectStateResponseSchema = z
   })
   .passthrough()
 
-const serviceHealthRecordSchema = z
-  .object({
-    name: z.string().trim().min(1),
-    healthy: z.boolean(),
-    status: z.string().optional(),
-    info: z.unknown().optional(),
-    error: z.unknown().optional(),
-  })
-  .passthrough()
-
-const serviceHealthResponseSchema = z.array(serviceHealthRecordSchema).max(50)
 const restoreResponseSchema = z.object({}).strict()
 
 type AvailabilityEnvironment = Record<string, string | undefined>
 
 type DemoAvailabilityConfig = {
-  healthWebhookUrl: string
   projectRefs: Record<DemoAvailabilityKey, string>
   signingSecret: string
   statusWebhookUrl: string
@@ -135,21 +123,31 @@ export function normalizeDemoProjectStateResponse(
 
   return {
     ref: result.data.ref,
-    status: result.data.status,
+    status: result.data.status.trim().toUpperCase(),
   }
 }
 
-export function normalizeDemoHealthResponse(input: unknown): DemoAvailabilityState {
-  const result = serviceHealthResponseSchema.safeParse(input)
+export function normalizeDemoProjectStatus(
+  status: string,
+): DemoAvailabilityState {
+  const normalizedStatus = status.trim().toUpperCase()
 
-  if (!result.success || result.data.length === 0) {
+  if (!normalizedStatus) {
     throw new DemoAvailabilityError(
-      'Demo health webhook returned a malformed response.',
+      'Demo status webhook returned a malformed response.',
       'malformed-response',
     )
   }
 
-  return result.data.every((service) => service.healthy) ? 'active' : 'waking'
+  if (normalizedStatus === 'INACTIVE') {
+    return 'inactive'
+  }
+
+  if (normalizedStatus === 'ACTIVE_HEALTHY') {
+    return 'active'
+  }
+
+  return 'waking'
 }
 
 export function normalizeDemoWakeResponse(
@@ -177,7 +175,6 @@ export async function fetchDemoAvailabilityStatuses(
     env?: AvailabilityEnvironment
     fetcher?: typeof fetch
     force?: boolean
-    healthWebhookUrl?: string
     now?: number
     signingSecret?: string
     statusWebhookUrl?: string
@@ -256,20 +253,7 @@ async function fetchDemoAvailabilityState(
   })
   const normalizedProject = normalizeDemoProjectStateResponse(projectState, ref)
 
-  if (normalizedProject.status === 'INACTIVE') {
-    return 'inactive'
-  }
-
-  const health = await postSignedWebhookJson({
-    body: createDemoWebhookBody(ref),
-    fetcher,
-    responseMaxBytes: DEMO_AVAILABILITY_RESPONSE_MAX_BYTES,
-    signingSecret: config.signingSecret,
-    timeoutMs,
-    webhookUrl: config.healthWebhookUrl,
-  })
-
-  return normalizeDemoHealthResponse(health)
+  return normalizeDemoProjectStatus(normalizedProject.status)
 }
 
 export async function wakeDemo(
@@ -299,17 +283,14 @@ export async function wakeDemo(
 
 function getDemoAvailabilityConfig({
   env = process.env,
-  healthWebhookUrl,
   signingSecret,
   statusWebhookUrl,
 }: {
   env?: AvailabilityEnvironment
-  healthWebhookUrl?: string
   signingSecret?: string
   statusWebhookUrl?: string
 }): DemoAvailabilityConfig {
   const config = {
-    healthWebhookUrl: healthWebhookUrl ?? env.DEMO_HEALTH_WEBHOOK_URL,
     projectRefs: {
       alan: resolveDemoProjectRef('alan', env),
       mlp: resolveDemoProjectRef('mlp', env),
@@ -321,7 +302,6 @@ function getDemoAvailabilityConfig({
 
   if (
     !config.statusWebhookUrl ||
-    !config.healthWebhookUrl ||
     !config.wakeWebhookUrl ||
     !config.signingSecret
   ) {

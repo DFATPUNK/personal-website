@@ -22,12 +22,10 @@ alan -> ALAN_SUPABASE_PROJECT_REF
 mlp  -> MLP_SUPABASE_PROJECT_REF
 ```
 
-The website calls three n8n Production Webhook workflows with server-only
-values:
+The website calls two n8n Production Webhook workflows with server-only values:
 
 ```txt
 DEMO_STATUS_WEBHOOK_URL
-DEMO_HEALTH_WEBHOOK_URL
 DEMO_WAKE_WEBHOOK_URL
 DEMO_WEBHOOK_SIGNING_SECRET
 ALAN_SUPABASE_PROJECT_REF
@@ -40,11 +38,9 @@ Meanings:
 DEMO_STATUS_WEBHOOK_URL
     n8n Production Webhook URL that proxies GET /v1/projects/{ref}
 
-DEMO_HEALTH_WEBHOOK_URL
-    n8n Production Webhook URL that proxies GET /v1/projects/{ref}/health
-
 DEMO_WAKE_WEBHOOK_URL
-    n8n Production Webhook URL that proxies POST /v1/projects/{ref}/restore
+    n8n Production Webhook URL that conditionally proxies
+    POST /v1/projects/{ref}/restore
 ```
 
 Do not use n8n Test URLs for persistent Vercel configuration. Vercel
@@ -96,8 +92,9 @@ but they are server-only configuration. They are sent only from Vercel server
 routes to signed n8n webhooks. n8n should additionally allowlist the two
 expected refs before calling Supabase.
 
-Alan and MLP Supabase project URLs, anon keys, publishable keys, and direct
-`/rest/v1/` health checks are not required for this availability workflow.
+Alan and MLP Supabase project URLs, anon keys, publishable keys, direct
+`/rest/v1/` health checks, and the Supabase Management API `/health` endpoint
+are intentionally not part of the V1 availability workflow.
 
 ## Supabase Management API Calls
 
@@ -122,35 +119,24 @@ Required fine-grained permission:
 project_admin_read
 ```
 
-Use the returned project `status` to identify clearly inactive or paused
-projects.
-
-Read service health:
+The website uses the returned project `status` conservatively:
 
 ```txt
-GET https://api.supabase.com/v1/projects/{ref}/health
+INACTIVE
+    -> inactive
+
+ACTIVE_HEALTHY
+    -> active
+
+any other valid non-empty status
+    -> waking
 ```
 
-Required fine-grained permission:
-
-```txt
-project_admin_read
-```
-
-The official endpoint requires the `services` query parameter and optionally
-accepts `timeout_ms`. Do not hard-code an unverified enum list in the workflow
-documentation or implementation notes. Select the required service values from
-the current Supabase API reference or the observed n8n request result. For this
-site, the health decision must include the database/data API service required by
-the demos.
-
-The health response is an array of service records including fields such as:
-
-- `name`;
-- `healthy`;
-- `status`;
-- optional `info`;
-- optional `error`.
+The separate Supabase service-health endpoint is blocked by its required
+`services` query parameter and is intentionally not used in V1. Do not report
+unknown statuses as `active`; intermediate, startup, restoring, or unhealthy
+states should remain `waking` until the project status becomes
+`ACTIVE_HEALTHY`.
 
 Restore a paused project:
 
@@ -174,7 +160,7 @@ Do not confuse this project-resume endpoint with PITR backup restore, database
 backup restore, or `GET /v1/projects/{ref}/restore`, which lists available
 restore versions.
 
-## Project-State Webhook
+## Status Webhook
 
 Input:
 
@@ -189,60 +175,30 @@ Expected successful response:
 ```json
 {
   "ref": "abcdefghijklmnopqrst",
-  "status": "INACTIVE"
+  "status": "ACTIVE_HEALTHY"
 }
 ```
 
 The response may include other Supabase project fields, but the website selects
-only `ref` and `status`. The returned `ref` must equal the requested ref.
+only `ref` and `status`. The website validates:
+
+- the response is an object;
+- `ref` is a valid 20-character project ref;
+- `status` is a non-empty string;
+- the returned `ref` equals the requested ref.
+
+Status matching trims whitespace and normalizes case to uppercase.
 
 Normalization:
 
 - `INACTIVE` -> `inactive`;
-- `ACTIVE_HEALTHY` -> call the health webhook;
-- any other non-empty provider status -> call the health webhook rather than
-  guessing that it is active;
-- missing config, malformed response, returned-ref mismatch, timeout,
-  authentication failure, or provider failure -> `unavailable`.
+- `ACTIVE_HEALTHY` -> `active`;
+- any other valid non-empty provider status -> `waking`;
+- missing config, malformed response, returned-ref mismatch, empty status,
+  timeout, authentication failure, or provider failure -> `unavailable`.
 
-Do not expose the raw project status publicly.
-
-## Service-Health Webhook
-
-Call this only when the project-state result is not `INACTIVE`.
-
-Input:
-
-```json
-{
-  "ref": "abcdefghijklmnopqrst"
-}
-```
-
-Expected successful response: a bounded array of service-health records:
-
-```json
-[
-  {
-    "name": "auth",
-    "healthy": true,
-    "status": "COMING_UP"
-  }
-]
-```
-
-The website validates records with a non-empty `name`, boolean `healthy`, and
-optional string `status`.
-
-Normalization:
-
-- non-empty array and every returned required service has `healthy: true` ->
-  `active`;
-- valid response with at least one `healthy: false` -> `waking`;
-- empty array, malformed response, timeout, authentication failure, or provider
-  failure -> `unavailable`.
-
-Do not expose the raw health array publicly.
+Do not expose the raw project status publicly. Unknown but valid non-empty
+statuses must remain `waking`, not `active` and not `unavailable`.
 
 ## Status Orchestration
 
@@ -250,17 +206,17 @@ For each managed demo key:
 
 1. Resolve its server-only project ref.
 2. Call `DEMO_STATUS_WEBHOOK_URL` with `{ "ref": ref }`.
-3. If project status is `INACTIVE`, return `inactive`.
-4. Otherwise call `DEMO_HEALTH_WEBHOOK_URL` with `{ "ref": ref }`.
-5. Return logical key, normalized state, and `checkedAt` only.
+3. Normalize `INACTIVE` to `inactive`.
+4. Normalize `ACTIVE_HEALTHY` to `active`.
+5. Normalize any other valid non-empty status to `waking`.
+6. Return logical key, normalized state, and `checkedAt` only.
 
 Alan and MLP are fetched independently and in parallel when practical. A failure
 for one project must not force the other project to `unavailable`. The website
 caches only normalized safe state and timestamps for a short window.
 
-Do not report `active` solely because `GET /v1/projects/{ref}` returns an
-active-looking status. Do not report `inactive` when the integration cannot
-determine the state.
+Do not report `inactive` when the integration cannot determine the state.
+Configuration, request, and validation failures normalize to `unavailable`.
 
 ## Wake Webhook
 
@@ -294,7 +250,7 @@ request. The website normalizes it to the existing public contract:
 
 The public response uses the logical key, never the project ref. After an
 accepted wake, the website clears its short status cache and lets later status
-checks detect service-health readiness.
+checks detect `ACTIVE_HEALTHY`.
 
 The n8n wake workflow remains responsible for authoritative deduplication before
 calling Supabase restore. It must validate HMAC and timestamp, check that the
@@ -310,8 +266,9 @@ Data Table deduplication to reduce request volume.
 
 ## Optional Preventive Activity
 
-A separate scheduled n8n workflow may run the same Management API state and
-service-health checks once or twice per day and update the n8n Data Table cache.
-This is preventive only. The website routes must function safely without it.
-Do not introduce Supabase project URLs or anon/publishable keys for this
-availability workflow without a separate review.
+A separate scheduled n8n workflow may run a lightweight Management API project
+state check once or twice per day and update the n8n Data Table cache. This is
+preventive only. The website routes must function safely without it. Do not
+introduce Supabase project URLs, anon/publishable keys, direct REST health
+checks, or the Management API `/health` endpoint for this V1 availability
+workflow without a separate review.

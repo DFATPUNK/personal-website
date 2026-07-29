@@ -6,8 +6,8 @@ import {
   createDemoWebhookBody,
   createUnavailableStatuses,
   fetchDemoAvailabilityStatuses,
-  normalizeDemoHealthResponse,
   normalizeDemoProjectStateResponse,
+  normalizeDemoProjectStatus,
   normalizeDemoWakeResponse,
   resetDemoAvailabilityCacheForTests,
   resolveDemoProjectRef,
@@ -26,7 +26,6 @@ const alanRef = 'abcdefghijklmnopqrst'
 const mlpRef = 'qrstuvwxyzabcdefghij'
 const testEnv = {
   ALAN_SUPABASE_PROJECT_REF: alanRef,
-  DEMO_HEALTH_WEBHOOK_URL: 'https://n8n.example/health',
   DEMO_STATUS_WEBHOOK_URL: 'https://n8n.example/status',
   DEMO_WAKE_WEBHOOK_URL: 'https://n8n.example/wake',
   DEMO_WEBHOOK_SIGNING_SECRET: 'secret',
@@ -114,7 +113,7 @@ describe('demo availability API contracts', () => {
       normalizeDemoProjectStateResponse(
         {
           ref: alanRef,
-          status: 'INACTIVE',
+          status: ' inactive ',
           rawProviderPayload: { token: 'secret' },
         },
         alanRef,
@@ -132,23 +131,14 @@ describe('demo availability API contracts', () => {
     ).toThrow(/malformed/)
   })
 
-  it('normalizes service health responses without exposing raw provider data', () => {
-    expect(
-      normalizeDemoHealthResponse([
-        { name: 'rest', healthy: true, status: 'OK' },
-        { name: 'db', healthy: true },
-      ]),
-    ).toBe('active')
-    expect(
-      normalizeDemoHealthResponse([
-        { name: 'rest', healthy: true },
-        { name: 'db', healthy: false, status: 'COMING_UP' },
-      ]),
-    ).toBe('waking')
-    expect(() => normalizeDemoHealthResponse([])).toThrow(/malformed/)
-    expect(() =>
-      normalizeDemoHealthResponse([{ name: '', healthy: true }]),
-    ).toThrow(/malformed/)
+  it('normalizes Supabase project statuses conservatively', () => {
+    expect(normalizeDemoProjectStatus('INACTIVE')).toBe('inactive')
+    expect(normalizeDemoProjectStatus(' inactive ')).toBe('inactive')
+    expect(normalizeDemoProjectStatus('ACTIVE_HEALTHY')).toBe('active')
+    expect(normalizeDemoProjectStatus(' active_healthy ')).toBe('active')
+    expect(normalizeDemoProjectStatus('RESTORING')).toBe('waking')
+    expect(normalizeDemoProjectStatus('ACTIVE_UNHEALTHY')).toBe('waking')
+    expect(() => normalizeDemoProjectStatus('   ')).toThrow(/malformed/)
   })
 
   it('returns unavailable statuses when all external variables are unset', async () => {
@@ -203,7 +193,7 @@ describe('demo availability API contracts', () => {
     expect(timingSafeEqualHex(signature, '00')).toBe(false)
   })
 
-  it('orchestrates status and health webhooks and caches results', async () => {
+  it('orchestrates signed status webhooks and caches results', async () => {
     resetDemoAvailabilityCacheForTests()
     const calls: Array<{ body: string; signed: boolean; url: string }> = []
     const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -216,15 +206,11 @@ describe('demo availability API contracts', () => {
       })
       const ref = JSON.parse(body).ref as string
 
-      if (url.endsWith('/status')) {
-        return jsonResponse({
-          ref,
-          status: ref === alanRef ? 'INACTIVE' : 'ACTIVE_HEALTHY',
-          rawProviderPayload: { secret: 'not-public' },
-        })
-      }
-
-      return jsonResponse([{ name: 'rest', healthy: true, status: 'OK' }])
+      return jsonResponse({
+        ref,
+        status: ref === alanRef ? 'INACTIVE' : 'ACTIVE_HEALTHY',
+        rawProviderPayload: { secret: 'not-public' },
+      })
     }
 
     const first = await fetchDemoAvailabilityStatuses({
@@ -241,26 +227,23 @@ describe('demo availability API contracts', () => {
     expect(first.alan.state).toBe('inactive')
     expect(first.mlp.state).toBe('active')
     expect(second).toEqual(first)
-    expect(calls).toHaveLength(3)
+    expect(calls).toHaveLength(2)
     expect(calls.map((call) => call.body)).toEqual([
       '{"ref":"abcdefghijklmnopqrst"}',
-      '{"ref":"qrstuvwxyzabcdefghij"}',
       '{"ref":"qrstuvwxyzabcdefghij"}',
     ])
     expect(calls.every((call) => call.signed)).toBe(true)
     expect(JSON.stringify(first)).not.toMatch(/ref|ACTIVE_HEALTHY|secret/)
   })
 
-  it('maps unhealthy service health to waking', async () => {
+  it('maps unknown valid project statuses to waking', async () => {
     resetDemoAvailabilityCacheForTests()
-    const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const fetcher = async (_input: RequestInfo | URL, init?: RequestInit) => {
       const ref = JSON.parse(readRequestBody(init)).ref as string
-
-      if (input.toString().endsWith('/status')) {
-        return jsonResponse({ ref, status: 'ACTIVE_HEALTHY' })
-      }
-
-      return jsonResponse([{ name: 'rest', healthy: ref !== alanRef }])
+      return jsonResponse({
+        ref,
+        status: ref === alanRef ? 'RESTORING' : 'ACTIVE_UNHEALTHY',
+      })
     }
 
     const statuses = await fetchDemoAvailabilityStatuses({
@@ -270,23 +253,19 @@ describe('demo availability API contracts', () => {
     })
 
     expect(statuses.alan.state).toBe('waking')
-    expect(statuses.mlp.state).toBe('active')
+    expect(statuses.mlp.state).toBe('waking')
   })
 
   it('keeps one project failure from forcing the other unavailable', async () => {
     resetDemoAvailabilityCacheForTests()
-    const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const fetcher = async (_input: RequestInfo | URL, init?: RequestInit) => {
       const ref = JSON.parse(readRequestBody(init)).ref as string
 
       if (ref === alanRef) {
         return jsonResponse({ ref: mlpRef, status: 'ACTIVE_HEALTHY' })
       }
 
-      if (input.toString().endsWith('/status')) {
-        return jsonResponse({ ref, status: 'ACTIVE_HEALTHY' })
-      }
-
-      return jsonResponse([{ name: 'rest', healthy: true }])
+      return jsonResponse({ ref, status: 'ACTIVE_HEALTHY' })
     }
 
     const statuses = await fetchDemoAvailabilityStatuses({
@@ -299,16 +278,12 @@ describe('demo availability API contracts', () => {
     expect(statuses.mlp.state).toBe('active')
   })
 
-  it('surfaces empty or malformed health responses as unavailable', async () => {
+  it('surfaces empty or malformed status responses as unavailable', async () => {
     resetDemoAvailabilityCacheForTests()
-    const fetcher = async (input: RequestInfo | URL, init?: RequestInit) => {
+    const fetcher = async (_input: RequestInfo | URL, init?: RequestInit) => {
       const ref = JSON.parse(readRequestBody(init)).ref as string
 
-      if (input.toString().endsWith('/status')) {
-        return jsonResponse({ ref, status: 'ACTIVE_HEALTHY' })
-      }
-
-      return jsonResponse(ref === alanRef ? [] : { provider: 'raw' })
+      return jsonResponse(ref === alanRef ? { ref, status: '   ' } : [])
     }
 
     const statuses = await fetchDemoAvailabilityStatuses({
