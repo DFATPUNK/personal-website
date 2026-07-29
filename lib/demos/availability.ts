@@ -1,12 +1,11 @@
 import { z } from 'zod'
 
 import {
-  demoAvailabilityKeySchema,
   demoAvailabilityKeys,
   type DemoAvailabilityKey,
 } from '@/lib/content/demos'
 import {
-  demoAvailabilityStates,
+  type DemoAvailabilityState,
   type DemoAvailabilityStatuses,
 } from '@/lib/demos/availability-contract'
 import { readBoundedText } from '@/lib/server/http'
@@ -24,29 +23,37 @@ export const DEMO_AVAILABILITY_TIMEOUT_MS = 6000
 export const DEMO_AVAILABILITY_RESPONSE_MAX_BYTES = 20_000
 export const DEMO_WAKE_RESPONSE_MAX_BYTES = 6000
 
-const n8nStatusSchema = z
-  .object({
-    ok: z.literal(true),
-    statuses: z.record(
-      demoAvailabilityKeySchema,
-      z
-        .object({
-          key: demoAvailabilityKeySchema,
-          state: z.enum(demoAvailabilityStates),
-          checkedAt: z.string().datetime(),
-        })
-        .strict(),
-    ),
-  })
-  .strict()
+const demoProjectRefSchema = z.string().regex(/^[a-z0-9]{20}$/)
 
-const n8nWakeSchema = z
+const projectStateResponseSchema = z
   .object({
-    ok: z.literal(true),
-    key: demoAvailabilityKeySchema,
-    state: z.literal('waking'),
+    ref: demoProjectRefSchema,
+    status: z.string().trim().min(1),
   })
-  .strict()
+  .passthrough()
+
+const serviceHealthRecordSchema = z
+  .object({
+    name: z.string().trim().min(1),
+    healthy: z.boolean(),
+    status: z.string().optional(),
+    info: z.unknown().optional(),
+    error: z.unknown().optional(),
+  })
+  .passthrough()
+
+const serviceHealthResponseSchema = z.array(serviceHealthRecordSchema).max(50)
+const restoreResponseSchema = z.object({}).strict()
+
+type AvailabilityEnvironment = Record<string, string | undefined>
+
+type DemoAvailabilityConfig = {
+  healthWebhookUrl: string
+  projectRefs: Record<DemoAvailabilityKey, string>
+  signingSecret: string
+  statusWebhookUrl: string
+  wakeWebhookUrl: string
+}
 
 let statusCache:
   | {
@@ -82,41 +89,76 @@ export function createUnavailableStatuses(checkedAt = new Date().toISOString()) 
   ) as DemoAvailabilityStatuses
 }
 
-export function normalizeDemoAvailabilityStatuses(input: unknown) {
-  const result = n8nStatusSchema.safeParse(input)
+export function resolveDemoProjectRef(
+  key: DemoAvailabilityKey,
+  env: AvailabilityEnvironment = process.env,
+) {
+  const envName =
+    key === 'alan' ? 'ALAN_SUPABASE_PROJECT_REF' : 'MLP_SUPABASE_PROJECT_REF'
+  const result = demoProjectRefSchema.safeParse(env[envName])
 
   if (!result.success) {
+    throw new DemoAvailabilityError(
+      'Demo project ref is missing or malformed.',
+      'missing-config',
+    )
+  }
+
+  return result.data
+}
+
+export function createDemoWebhookBody(ref: string) {
+  const result = demoProjectRefSchema.safeParse(ref)
+
+  if (!result.success) {
+    throw new DemoAvailabilityError(
+      'Demo project ref is missing or malformed.',
+      'missing-config',
+    )
+  }
+
+  return JSON.stringify({ ref: result.data })
+}
+
+export function normalizeDemoProjectStateResponse(
+  input: unknown,
+  requestedRef: string,
+) {
+  const result = projectStateResponseSchema.safeParse(input)
+
+  if (!result.success || result.data.ref !== requestedRef) {
     throw new DemoAvailabilityError(
       'Demo status webhook returned a malformed response.',
       'malformed-response',
     )
   }
 
-  const checkedAt = new Date().toISOString()
-  const fallback = createUnavailableStatuses(checkedAt)
-
-  return Object.fromEntries(
-    demoAvailabilityKeys.map((key) => {
-      const status = result.data.statuses[key]
-
-      return [
-        key,
-        status?.key === key
-          ? {
-              key,
-              state: status.state,
-              checkedAt: status.checkedAt,
-            }
-          : fallback[key],
-      ]
-    }),
-  ) as DemoAvailabilityStatuses
+  return {
+    ref: result.data.ref,
+    status: result.data.status,
+  }
 }
 
-export function normalizeDemoWakeResponse(input: unknown, key: DemoAvailabilityKey) {
-  const result = n8nWakeSchema.safeParse(input)
+export function normalizeDemoHealthResponse(input: unknown): DemoAvailabilityState {
+  const result = serviceHealthResponseSchema.safeParse(input)
 
-  if (!result.success || result.data.key !== key) {
+  if (!result.success || result.data.length === 0) {
+    throw new DemoAvailabilityError(
+      'Demo health webhook returned a malformed response.',
+      'malformed-response',
+    )
+  }
+
+  return result.data.every((service) => service.healthy) ? 'active' : 'waking'
+}
+
+export function normalizeDemoWakeResponse(
+  input: unknown,
+  key: DemoAvailabilityKey,
+) {
+  const result = restoreResponseSchema.safeParse(input)
+
+  if (!result.success) {
     throw new DemoAvailabilityError(
       'Demo wake webhook returned a malformed response.',
       'malformed-response',
@@ -126,18 +168,20 @@ export function normalizeDemoWakeResponse(input: unknown, key: DemoAvailabilityK
   return {
     ok: true as const,
     key,
-    state: result.data.state,
+    state: 'waking' as const,
   }
 }
 
 export async function fetchDemoAvailabilityStatuses(
   options: {
+    env?: AvailabilityEnvironment
     fetcher?: typeof fetch
     force?: boolean
+    healthWebhookUrl?: string
     now?: number
-    timeoutMs?: number
-    webhookUrl?: string
     signingSecret?: string
+    statusWebhookUrl?: string
+    timeoutMs?: number
   } = {},
 ) {
   const now = options.now ?? Date.now()
@@ -146,28 +190,202 @@ export async function fetchDemoAvailabilityStatuses(
     return statusCache.statuses
   }
 
-  const webhookUrl = options.webhookUrl ?? process.env.DEMO_STATUS_WEBHOOK_URL
-  const signingSecret =
-    options.signingSecret ?? process.env.DEMO_WEBHOOK_SIGNING_SECRET
+  const config = getDemoAvailabilityConfig(options)
+  const checkedAt = new Date().toISOString()
+  const fetcher = options.fetcher ?? fetch
+  const statuses = Object.fromEntries(
+    await Promise.all(
+      demoAvailabilityKeys.map(async (key) => {
+        try {
+          const state = await fetchDemoAvailabilityState(key, {
+            config,
+            fetcher,
+            timeoutMs: options.timeoutMs,
+          })
 
-  if (!webhookUrl || !signingSecret) {
+          return [
+            key,
+            {
+              key,
+              state,
+              checkedAt,
+            },
+          ]
+        } catch {
+          return [
+            key,
+            {
+              key,
+              state: 'unavailable' as const,
+              checkedAt,
+            },
+          ]
+        }
+      }),
+    ),
+  ) as DemoAvailabilityStatuses
+
+  statusCache = {
+    expiresAt: now + DEMO_AVAILABILITY_CACHE_SECONDS * 1000,
+    statuses,
+  }
+
+  return statuses
+}
+
+async function fetchDemoAvailabilityState(
+  key: DemoAvailabilityKey,
+  {
+    config,
+    fetcher,
+    timeoutMs,
+  }: {
+    config: DemoAvailabilityConfig
+    fetcher: typeof fetch
+    timeoutMs: number | undefined
+  },
+): Promise<DemoAvailabilityState> {
+  const ref = config.projectRefs[key]
+  const projectState = await postSignedWebhookJson({
+    body: createDemoWebhookBody(ref),
+    fetcher,
+    responseMaxBytes: DEMO_AVAILABILITY_RESPONSE_MAX_BYTES,
+    signingSecret: config.signingSecret,
+    timeoutMs,
+    webhookUrl: config.statusWebhookUrl,
+  })
+  const normalizedProject = normalizeDemoProjectStateResponse(projectState, ref)
+
+  if (normalizedProject.status === 'INACTIVE') {
+    return 'inactive'
+  }
+
+  const health = await postSignedWebhookJson({
+    body: createDemoWebhookBody(ref),
+    fetcher,
+    responseMaxBytes: DEMO_AVAILABILITY_RESPONSE_MAX_BYTES,
+    signingSecret: config.signingSecret,
+    timeoutMs,
+    webhookUrl: config.healthWebhookUrl,
+  })
+
+  return normalizeDemoHealthResponse(health)
+}
+
+export async function wakeDemo(
+  key: DemoAvailabilityKey,
+  options: {
+    env?: AvailabilityEnvironment
+    fetcher?: typeof fetch
+    signingSecret?: string
+    timeoutMs?: number
+    wakeWebhookUrl?: string
+  } = {},
+) {
+  const config = getDemoWakeConfig(key, options)
+  const response = await postSignedWebhookJson({
+    body: createDemoWebhookBody(config.ref),
+    fetcher: options.fetcher ?? fetch,
+    responseMaxBytes: DEMO_WAKE_RESPONSE_MAX_BYTES,
+    signingSecret: config.signingSecret,
+    timeoutMs: options.timeoutMs,
+    webhookUrl: config.wakeWebhookUrl,
+  })
+
+  statusCache = undefined
+
+  return normalizeDemoWakeResponse(response, key)
+}
+
+function getDemoAvailabilityConfig({
+  env = process.env,
+  healthWebhookUrl,
+  signingSecret,
+  statusWebhookUrl,
+}: {
+  env?: AvailabilityEnvironment
+  healthWebhookUrl?: string
+  signingSecret?: string
+  statusWebhookUrl?: string
+}): DemoAvailabilityConfig {
+  const config = {
+    healthWebhookUrl: healthWebhookUrl ?? env.DEMO_HEALTH_WEBHOOK_URL,
+    projectRefs: {
+      alan: resolveDemoProjectRef('alan', env),
+      mlp: resolveDemoProjectRef('mlp', env),
+    },
+    signingSecret: signingSecret ?? env.DEMO_WEBHOOK_SIGNING_SECRET,
+    statusWebhookUrl: statusWebhookUrl ?? env.DEMO_STATUS_WEBHOOK_URL,
+    wakeWebhookUrl: env.DEMO_WAKE_WEBHOOK_URL,
+  }
+
+  if (
+    !config.statusWebhookUrl ||
+    !config.healthWebhookUrl ||
+    !config.wakeWebhookUrl ||
+    !config.signingSecret
+  ) {
     throw new DemoAvailabilityError(
-      'Demo availability webhook is not configured.',
+      'Demo availability webhooks are not configured.',
       'missing-config',
     )
   }
 
-  const body = JSON.stringify({
-    keys: demoAvailabilityKeys,
-  })
+  return config as DemoAvailabilityConfig
+}
+
+function getDemoWakeConfig(
+  key: DemoAvailabilityKey,
+  {
+    env = process.env,
+    signingSecret,
+    wakeWebhookUrl,
+  }: {
+    env?: AvailabilityEnvironment
+    signingSecret?: string
+    wakeWebhookUrl?: string
+  },
+) {
+  const config = {
+    ref: resolveDemoProjectRef(key, env),
+    signingSecret: signingSecret ?? env.DEMO_WEBHOOK_SIGNING_SECRET,
+    wakeWebhookUrl: wakeWebhookUrl ?? env.DEMO_WAKE_WEBHOOK_URL,
+  }
+
+  if (!config.signingSecret || !config.wakeWebhookUrl) {
+    throw new DemoAvailabilityError(
+      'Demo wake webhook is not configured.',
+      'missing-config',
+    )
+  }
+
+  return config as {
+    ref: string
+    signingSecret: string
+    wakeWebhookUrl: string
+  }
+}
+
+async function postSignedWebhookJson({
+  body,
+  fetcher,
+  responseMaxBytes,
+  signingSecret,
+  timeoutMs = DEMO_AVAILABILITY_TIMEOUT_MS,
+  webhookUrl,
+}: {
+  body: string
+  fetcher: typeof fetch
+  responseMaxBytes: number
+  signingSecret: string
+  timeoutMs: number | undefined
+  webhookUrl: string
+}) {
   const controller = new AbortController()
-  const timeout = setTimeout(
-    () => controller.abort(),
-    options.timeoutMs ?? DEMO_AVAILABILITY_TIMEOUT_MS,
-  )
+  const timeout = setTimeout(() => controller.abort(), timeoutMs)
 
   try {
-    const response = await (options.fetcher ?? fetch)(webhookUrl, {
+    const response = await fetcher(webhookUrl, {
       method: 'POST',
       headers: createSignedWebhookHeaders({
         body,
@@ -185,18 +403,16 @@ export async function fetchDemoAvailabilityStatuses(
       )
     }
 
-    const rawResponse = await readBoundedText(
-      response,
-      DEMO_AVAILABILITY_RESPONSE_MAX_BYTES,
-    )
-    const statuses = normalizeDemoAvailabilityStatuses(JSON.parse(rawResponse))
+    const rawResponse = await readBoundedText(response, responseMaxBytes)
 
-    statusCache = {
-      expiresAt: now + DEMO_AVAILABILITY_CACHE_SECONDS * 1000,
-      statuses,
+    try {
+      return JSON.parse(rawResponse) as unknown
+    } catch {
+      throw new DemoAvailabilityError(
+        'Demo availability webhook returned malformed JSON.',
+        'malformed-response',
+      )
     }
-
-    return statuses
   } catch (error) {
     if (error instanceof DemoAvailabilityError) {
       throw error
@@ -204,74 +420,6 @@ export async function fetchDemoAvailabilityStatuses(
 
     throw new DemoAvailabilityError(
       'Demo availability webhook request failed.',
-      'network-error',
-    )
-  } finally {
-    clearTimeout(timeout)
-  }
-}
-
-export async function wakeDemo(
-  key: DemoAvailabilityKey,
-  options: {
-    fetcher?: typeof fetch
-    timeoutMs?: number
-    webhookUrl?: string
-    signingSecret?: string
-  } = {},
-) {
-  const webhookUrl = options.webhookUrl ?? process.env.DEMO_WAKE_WEBHOOK_URL
-  const signingSecret =
-    options.signingSecret ?? process.env.DEMO_WEBHOOK_SIGNING_SECRET
-
-  if (!webhookUrl || !signingSecret) {
-    throw new DemoAvailabilityError(
-      'Demo wake webhook is not configured.',
-      'missing-config',
-    )
-  }
-
-  const body = JSON.stringify({ key })
-  const controller = new AbortController()
-  const timeout = setTimeout(
-    () => controller.abort(),
-    options.timeoutMs ?? DEMO_AVAILABILITY_TIMEOUT_MS,
-  )
-
-  try {
-    const response = await (options.fetcher ?? fetch)(webhookUrl, {
-      method: 'POST',
-      headers: createSignedWebhookHeaders({
-        body,
-        secret: signingSecret,
-      }),
-      body,
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-
-    if (!response.ok) {
-      throw new DemoAvailabilityError(
-        'Demo wake webhook returned an unsuccessful status.',
-        'http-error',
-      )
-    }
-
-    const rawResponse = await readBoundedText(
-      response,
-      DEMO_WAKE_RESPONSE_MAX_BYTES,
-    )
-
-    statusCache = undefined
-
-    return normalizeDemoWakeResponse(JSON.parse(rawResponse), key)
-  } catch (error) {
-    if (error instanceof DemoAvailabilityError) {
-      throw error
-    }
-
-    throw new DemoAvailabilityError(
-      'Demo wake webhook request failed.',
       'network-error',
     )
   } finally {

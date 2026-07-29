@@ -43,8 +43,11 @@ The server calls n8n with server-only values:
 
 ```txt
 DEMO_STATUS_WEBHOOK_URL
+DEMO_HEALTH_WEBHOOK_URL
 DEMO_WAKE_WEBHOOK_URL
 DEMO_WEBHOOK_SIGNING_SECRET
+ALAN_SUPABASE_PROJECT_REF
+MLP_SUPABASE_PROJECT_REF
 ```
 
 Status responses use the normalized states `active`, `waking`, `inactive`, and
@@ -52,12 +55,18 @@ Status responses use the normalized states `active`, `waking`, `inactive`, and
 project refs, access tokens, anon keys, n8n URLs, and signing secrets are never
 sent to the browser.
 
-In n8n, availability uses the Supabase Management API only:
+The website maps only `alan` and `mlp` to server-only project refs. It sends
+those refs only from Vercel server routes to signed n8n webhooks using the exact
+raw JSON body `{ "ref": "<resolved-ref>" }`. The browser continues to use only
+logical keys and can never supply an arbitrary ref.
+
+In n8n, availability uses three Production Webhook workflows backed by the
+Supabase Management API:
 
 ```txt
-GET https://api.supabase.com/v1/projects/{ref}
-GET https://api.supabase.com/v1/projects/{ref}/health
-POST https://api.supabase.com/v1/projects/{ref}/restore
+DEMO_STATUS_WEBHOOK_URL -> GET https://api.supabase.com/v1/projects/{ref}
+DEMO_HEALTH_WEBHOOK_URL -> GET https://api.supabase.com/v1/projects/{ref}/health
+DEMO_WAKE_WEBHOOK_URL   -> POST https://api.supabase.com/v1/projects/{ref}/restore
 ```
 
 The status workflow reads project state first, then calls the Management API
@@ -68,8 +77,11 @@ state. Unknown states, malformed responses, timeouts, authentication failures,
 or provider failures normalize to `unavailable`.
 
 The availability workflows require only a Supabase Management API token plus
-Alan and MLP project refs in n8n. They do not require Supabase project URLs,
-anon/publishable keys, or direct `/rest/v1/` health checks.
+Alan and MLP project refs. Project refs are server-only configuration even
+though they are not credentials. They do not require Supabase project URLs,
+anon/publishable keys, or direct `/rest/v1/` health checks. Each n8n workflow
+must verify the HMAC before using the supplied ref and should additionally
+allowlist the two expected refs.
 
 The status route shares successful status data for about 15 seconds. Wake
 requests are never cached. When the integration variables are absent or n8n
@@ -84,11 +96,11 @@ session guard and shows a discreet `Retry wake-up` control after a short pause.
 Retrying is explicit, rate-limited by the UI state, and n8n remains the
 authoritative deduplication boundary.
 
-`DEMO_STATUS_WEBHOOK_URL` and `DEMO_WAKE_WEBHOOK_URL` must be the active
-production URLs from the n8n Webhook triggers. Do not store n8n Test URLs in
-persistent Vercel configuration. Signing-secret values must match between n8n
-and Vercel, and Vercel environment-variable changes apply only after a new
-deployment.
+`DEMO_STATUS_WEBHOOK_URL`, `DEMO_HEALTH_WEBHOOK_URL`, and
+`DEMO_WAKE_WEBHOOK_URL` must be the active production URLs from the n8n Webhook
+triggers. Do not store n8n Test URLs in persistent Vercel configuration.
+Signing-secret values must match between n8n and Vercel, and Vercel
+environment-variable changes apply only after a new deployment.
 
 ## Observed Route Discrepancy
 

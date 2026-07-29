@@ -13,13 +13,51 @@ GET /api/demos/availability
 POST /api/demos/availability/{key}/wake
 ```
 
-The browser never calls n8n or the Supabase Management API directly. The
-personal-site server calls n8n with:
+The browser never calls n8n or the Supabase Management API directly. It also
+never sends or chooses a Supabase project ref. The personal-site server resolves
+only these logical keys:
+
+```txt
+alan -> ALAN_SUPABASE_PROJECT_REF
+mlp  -> MLP_SUPABASE_PROJECT_REF
+```
+
+The website calls three n8n Production Webhook workflows with server-only
+values:
 
 ```txt
 DEMO_STATUS_WEBHOOK_URL
+DEMO_HEALTH_WEBHOOK_URL
 DEMO_WAKE_WEBHOOK_URL
 DEMO_WEBHOOK_SIGNING_SECRET
+ALAN_SUPABASE_PROJECT_REF
+MLP_SUPABASE_PROJECT_REF
+```
+
+Meanings:
+
+```txt
+DEMO_STATUS_WEBHOOK_URL
+    n8n Production Webhook URL that proxies GET /v1/projects/{ref}
+
+DEMO_HEALTH_WEBHOOK_URL
+    n8n Production Webhook URL that proxies GET /v1/projects/{ref}/health
+
+DEMO_WAKE_WEBHOOK_URL
+    n8n Production Webhook URL that proxies POST /v1/projects/{ref}/restore
+```
+
+Do not use n8n Test URLs for persistent Vercel configuration. Vercel
+environment-variable changes apply only after a new deployment.
+
+## Signed Requests
+
+Each website-to-n8n request sends the exact raw JSON body:
+
+```json
+{
+  "ref": "abcdefghijklmnopqrst"
+}
 ```
 
 Requests include:
@@ -32,16 +70,18 @@ x-jeremy-signature: HMAC SHA-256 hex digest
 The signature payload is:
 
 ```txt
-{timestamp}.{raw_request_body}
+{timestamp}.{exact_raw_body}
 ```
 
 n8n must recompute the signature with the shared secret and compare the hex
 digests with a constant-time comparison. Reject missing, malformed, or old
-timestamps; use a short validity window, such as five minutes.
+timestamps; use a short validity window, such as five minutes. Each workflow
+must verify the HMAC before using the supplied project ref.
 
 ## n8n Secrets And Credentials
 
-The n8n instance holds:
+The n8n instance holds the Supabase Management token, signing secret, and an
+allowlist of the two expected refs:
 
 ```txt
 SUPABASE_MANAGEMENT_TOKEN
@@ -50,9 +90,11 @@ MLP_SUPABASE_PROJECT_REF
 DEMO_WEBHOOK_SIGNING_SECRET
 ```
 
-The Supabase Management API access token must never be stored in Vercel or the
-browser when n8n is the privileged boundary. It must never be stored in Git or
-in any `NEXT_PUBLIC_*` variable.
+The Supabase Management API access token must never be stored in Vercel, Git,
+browser code, or any `NEXT_PUBLIC_*` variable. Project refs are not credentials,
+but they are server-only configuration. They are sent only from Vercel server
+routes to signed n8n webhooks. n8n should additionally allowlist the two
+expected refs before calling Supabase.
 
 Alan and MLP Supabase project URLs, anon keys, publishable keys, and direct
 `/rest/v1/` health checks are not required for this availability workflow.
@@ -132,60 +174,135 @@ Do not confuse this project-resume endpoint with PITR backup restore, database
 backup restore, or `GET /v1/projects/{ref}/restore`, which lists available
 restore versions.
 
-## Status Lookup Workflow
+## Project-State Webhook
 
-For each allowlisted key, `alan` and `mlp`:
+Input:
 
-1. Validate HMAC and timestamp.
-2. Map `alan` or `mlp` to the corresponding Supabase project ref.
-3. Read a short-lived cached state from an n8n Data Table when available.
-4. Query `GET /v1/projects/{ref}` from the Supabase Management API when stale.
-5. Normalize the project state:
-   - project status clearly inactive or paused -> `inactive`;
-   - project status indicates creation, restoration, or startup -> `waking`;
-   - project appears active -> call `GET /v1/projects/{ref}/health`;
-   - unknown status, malformed response, timeout, authentication failure, or
-     provider failure -> `unavailable`.
-6. Call `GET /v1/projects/{ref}/health` with the required `services` query
-   parameter before reporting `active`.
-7. Return `active` only when the required services are healthy.
-8. Return `waking` when a recent deduplicated wake exists but health is not
-   ready.
-9. Return `unavailable` for unknown health states, timeouts, malformed
-   responses, authentication failures, or provider errors.
-10. Cache only normalized safe state and timestamps.
+```json
+{
+  "ref": "abcdefghijklmnopqrst"
+}
+```
 
-Public responses must contain only logical keys, normalized states, and
-`checkedAt`. Do not expose raw Supabase payloads.
+Expected successful response:
 
-Supabase notes that recently restored services can take a couple of minutes to
-become fully operational. The Management API service-health response remains
-authoritative before reporting `active`. Do not report `active` solely because
-`GET /v1/projects/{ref}` returns an active-looking status. Do not report
-`inactive` when the integration cannot determine the state.
+```json
+{
+  "ref": "abcdefghijklmnopqrst",
+  "status": "INACTIVE"
+}
+```
 
-## Wake Workflow
+The response may include other Supabase project fields, but the website selects
+only `ref` and `status`. The returned `ref` must equal the requested ref.
 
-1. Validate HMAC, timestamp, and allowlisted key.
-2. Map `alan` or `mlp` to the corresponding Supabase project ref.
-3. Check the n8n Data Table for an existing recent wake operation.
-4. If a wake is already in progress, return `waking` without another restore.
-5. Query current project state.
-6. Call `POST /v1/projects/{ref}/restore` only when the project is inactive.
-7. Record demo key, `waking`, requested timestamp, last checked timestamp, and
-   last normalized result.
-8. Return the website contract:
+Normalization:
 
-   ```json
-   {
-     "ok": true,
-     "key": "alan",
-     "state": "waking"
-   }
-   ```
+- `INACTIVE` -> `inactive`;
+- `ACTIVE_HEALTHY` -> call the health webhook;
+- any other non-empty provider status -> call the health webhook rather than
+  guessing that it is active;
+- missing config, malformed response, returned-ref mismatch, timeout,
+  authentication failure, or provider failure -> `unavailable`.
 
-9. Do not wait synchronously for full project readiness.
-10. Let later status checks detect service-health readiness.
+Do not expose the raw project status publicly.
+
+## Service-Health Webhook
+
+Call this only when the project-state result is not `INACTIVE`.
+
+Input:
+
+```json
+{
+  "ref": "abcdefghijklmnopqrst"
+}
+```
+
+Expected successful response: a bounded array of service-health records:
+
+```json
+[
+  {
+    "name": "auth",
+    "healthy": true,
+    "status": "COMING_UP"
+  }
+]
+```
+
+The website validates records with a non-empty `name`, boolean `healthy`, and
+optional string `status`.
+
+Normalization:
+
+- non-empty array and every returned required service has `healthy: true` ->
+  `active`;
+- valid response with at least one `healthy: false` -> `waking`;
+- empty array, malformed response, timeout, authentication failure, or provider
+  failure -> `unavailable`.
+
+Do not expose the raw health array publicly.
+
+## Status Orchestration
+
+For each managed demo key:
+
+1. Resolve its server-only project ref.
+2. Call `DEMO_STATUS_WEBHOOK_URL` with `{ "ref": ref }`.
+3. If project status is `INACTIVE`, return `inactive`.
+4. Otherwise call `DEMO_HEALTH_WEBHOOK_URL` with `{ "ref": ref }`.
+5. Return logical key, normalized state, and `checkedAt` only.
+
+Alan and MLP are fetched independently and in parallel when practical. A failure
+for one project must not force the other project to `unavailable`. The website
+caches only normalized safe state and timestamps for a short window.
+
+Do not report `active` solely because `GET /v1/projects/{ref}` returns an
+active-looking status. Do not report `inactive` when the integration cannot
+determine the state.
+
+## Wake Webhook
+
+The website wake route accepts only the logical key in the URL. It never accepts
+a browser-supplied project ref.
+
+Input:
+
+```json
+{
+  "ref": "abcdefghijklmnopqrst"
+}
+```
+
+Supabase's successful project-restore response is:
+
+```json
+{}
+```
+
+Treat an HTTP 2xx response with a valid empty JSON object as an accepted wake
+request. The website normalizes it to the existing public contract:
+
+```json
+{
+  "ok": true,
+  "key": "alan",
+  "state": "waking"
+}
+```
+
+The public response uses the logical key, never the project ref. After an
+accepted wake, the website clears its short status cache and lets later status
+checks detect service-health readiness.
+
+The n8n wake workflow remains responsible for authoritative deduplication before
+calling Supabase restore. It must validate HMAC and timestamp, check that the
+supplied ref is allowlisted, read current project state, avoid duplicate restore
+calls during a recent wake operation, and call
+`POST /v1/projects/{ref}/restore` only when the project is inactive. If the
+current wake workflow calls Supabase restore unconditionally, update it to read
+project state and deduplicate before restore.
 
 Set provider timeouts and bounded retries conservatively. Respect the Supabase
 Management API rate limit and rely on the website's brief status cache plus n8n
